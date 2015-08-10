@@ -59,7 +59,7 @@ dependencies {
 	// in case [XLlogger](http://www.slf4j.org/extensions.html#extended_logger) is required
 	// compile group:'org.slf4j', name:'slf4j-ext', version:'1.7.12'
 
-    compile 'org.jgrapht:jgrapht:0.9.1'
+    compile 'org.jgrapht:jgrapht-core:0.9.1'
 
     compile 'org.apache.velocity:velocity:1.7'
 }
