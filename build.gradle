@@ -62,6 +62,18 @@ dependencies {
     compile 'org.jgrapht:jgrapht-core:0.9.1'
 
     compile 'org.apache.velocity:velocity:1.7'
+    
+    compile 'com.fasterxml.jackson.core:jackson-core:2.6.1'
+    
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.0.1'
+    
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.6.1'
+    
+    compile 'junit:junit:4.4'
+    
+    
+    
+    
 }
 
 repositories {
