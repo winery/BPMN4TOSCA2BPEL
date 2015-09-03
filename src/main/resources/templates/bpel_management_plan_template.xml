@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<process 
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	name="ManagementPlan" 
+	xmlns:tns="$plan_namespace"
+	targetNamespace="http://iaas.uni-stuttgart.de/bpmn4tosca/managementplan/"
+	xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+	xmlns:bpel4RestLight="http://iaas.uni-stuttgart.de/bpel/extensions/bpel4restlight"
+	xmlns:si="http://siserver.org/wsdl"  >
+
+	<import importType="http://schemas.xmlsoap.org/wsdl/" location="service_invoker_wsdl"
+		namespace="http://siserver.org/wsdl" />
+	<import importType="http://www.w3.org/2001/XMLSchema" location="service_invoker_xsd"
+		namespace="http://siserver.org/schema" /> <!-- TODO externalize NS -->
+	<import importType="http://schemas.xmlsoap.org/wsdl/" location="managementPlan.wsdl"
+		namespace="http://iaas.uni-stuttgart.de/bpmn4tosca/managementplan/" /> <!-- Todo place_holder wsdl and namespace -->
+
+	<extensions>
+		<extension mustUnderstand="yes"
+			namespace="http://iaas.uni-stuttgart.de/bpel/extensions/bpel4restlight" />
+	</extensions>
+
+	<partnerLinks>
+		<partnerLink name="client" initializePartnerRole="yes"
+			partnerLinkType="tns:ManagementPlanPLT" myRole="ManagementPlanProvider"
+			partnerRole="ManagementPlanClient" />
+			
+		<partnerLink name="serviceInvokerPL" initializePartnerRole="yes"
+			partnerLinkType="tns:OpenTOSCAServiceInvokerPLT" 
+			myRole="ServiceInvokerClient"
+			partnerRole="ServiceInvoker" />
+	</partnerLinks>
+	
+	<correlationSets>
+    	<correlationSet name="ServiceInvokerCS" properties="tns:ServiceInvokerRequestProperty"/>
+    </correlationSets>
+
+	<variables>
+		<variable name="input" messageType="tns:PlanInputMessage" />
+		<variable name="output" messageType="tns:planOutputMessage" />
+		<variable name="instanceDataAPIUrl" messageType="xsd:string" />
+
+		<!-- The values for these variables must be provided in the instantiating 
+			input message -->
+		<variable name="containerAPIServiceInstanceURL" type="xsd:string" />
+		<variable name="csarId" messageType="xsd:string" />
+		<variable name="serviceTemplateIdNamespaceURI" messageType="xsd:string" />
+		<variable name="serviceTemplateIdLocalPart" messageType="xsd:string" />
+		<variable name="serviceInstanceId" messageType="xsd:string" />
+		<variable name="correlationId" messageType="xsd:string" />
+		<variable name="planCallbackUrl" messageType="xsd:string" />
+		
+		<!-- Variable to store service invoker requests and responses -->
+		<variable name="siAsynchInput" messageType="si:invokeOperationAsyncMessage" />
+        <variable name="siResponse" messageType="si:invokeResponse" />
+	</variables>
+
+	<sequence>
+		<receive createInstance="yes" name="initiate" operation="initiatePlan"
+			partnerLink="client" portType="ManagementPlanPLT" variable="input" />
+
+		<!-- Get values for variables 'instanceDataAPIUrl', 'csarId', 'serviceTemplateId', 
+			'serviceInstanceId' from input message These values are required to read/write 
+			properties of the service instance the plan is working on -->
+		<assign name="initFromInputMsg" validate="no">
+			<copy>
+				<from variable="input" part="payload">
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[//*[local-name()='instanceDataAPIUrl']/text()]]></query>
+				</from>
+				<to variable="instanceDataAPIUrl" />
+			</copy>
+			<copy>
+				<from variable="input" part="payload">
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[//*[local-name()='csarId']/text()]]></query>
+				</from>
+				<to variable="csarId" />
+			</copy>
+			<copy>
+				<from variable="input" part="payload">
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[//*[local-name()='serviceTemplateIdNamespaceURI']/text()]]></query>
+				</from>
+				<to variable="serviceTemplateIdNamespaceURI" />
+			</copy>
+			<copy>
+				<from variable="input" part="payload">
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[//*[local-name()='serviceTemplateIdLocalPart']/text()]]></query>
+				</from>
+				<to variable="serviceTemplateIdNamespaceURI" />
+			</copy>
+			<copy>
+				<from variable="input" part="payload">
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[//*[local-name()='serviceInstanceId']/text()]]></query>
+				</from>
+				<to variable="serviceInstanceId" />
+			</copy>
+			<copy>
+				<from variable="input" part="payload">
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[//*[local-name()='planCallbackUrl']/text()]]></query>
+				</from>
+				<to variable="planCallbackUrl" />
+			</copy>
+		</assign>
+		
+		<!-- Check if this is build plan or management plan. It is a build plan if no instance data were created yet -->
+		#if( $isBuildPlan ) wir müssen hier schauen ob  service instance resource schon created, if  not dann is das hier n build plan
+   			<bpel4RestLight:POST accept="application/xml" response="TODO" uri="$bpelvar[containerAPIServiceInstanceURL]/serviceInstances?csarID=$bpelvar[csarId]&amp;serviceTemplateID={http://trustedcloud.de}TrustedCloudApplication2"/>
+		#end
+		
+		<!-- Perform management operations -->
+		#foreach( $mngmtTask in $mngmtTaskList)
+			 #parse( "management_activity_scope_template.xml" )
+		#end
+
+
+
+		<!-- Send response of plan execution to client -->
+		<assign name="createOutputMsg" validate="no">
+			<copy>
+				<from variable="correlationId" />
+				<to variable="output" part="payload">
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[//*[local-name()='correlationId']/text()]]></query>
+				</to>
+			</copy>
+		</assign>
+		<invoke name="callbackClient" inputVariable="output" operation="onResult"
+			partnerLink="client" portType="tns:PlanClientCallback" />
+	</sequence>
+</process>

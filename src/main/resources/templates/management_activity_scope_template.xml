@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<scope name="$mngmt_scope_name" xmlns:pp="http://opentosca.org/api/pp"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+
+	<!-- Template requires global variable 'serviceInstanceId' -->
+
+	<variables>
+		<!-- Must contain a <pp:nodeInstanceList> element with exactly one child 
+			<pp::nodeinstances> which contains exactly one child named <pp:link href="nodeInstanceId"> -->
+		<variable name="nodeInstanceUrlList" messageType="xsd:any" /> <!-- TODO set correct type -->
+		<variable name="nodeInstanceUrl" messageType="xsd:string" />
+		<variable name="mangementOperationRequest" messageType="si:invokeOperationAsyncMessage" />
+		<variable name="mangementOperationResponse" messageType="si:invokeResponse" />
+		
+		<!--  Variables holding the URLs of node instances of node templates  -->
+		#foreach($nodeTemplateId in $inputOutputNodeTemplateSet)
+			<variable name="nodeInstanceUrl_$nodeTemplateId" messageType="xsd:string" />
+			<variable name="properties_$nodeTemplateId" messageType="xsd:any" />
+		#end
+		
+		#foreach( $taskInputData in $taskInputDataList)
+			<variable name="$taskInputData.name" messageType="xsd:any" />
+		#end
+		
+<!-- 		#foreach($inputNodeTemplateId in $taskInputTargetNodeTemplateSet) -->
+<!-- 			<variable name="properties_$inputNodeTemplateId" messageType="xsd:any" /> -->
+<!-- 		#end -->
+		
+<!-- 		#foreach($outputNodeTemplateId in $taskOutputTargetNodeTemplateSet) -->
+<!-- 			<variable name="properties_$outputNodeTemplateId" messageType="xsd:any" /> -->
+<!-- 		#end -->
+
+
+	</variables>
+	<sequence name="$mngmt_scope_seq_name">
+
+	
+		<!-- Retrieve node instance URLs of instance of all nodes templates used either as input and output of this management operation -->
+		#foreach($nodeTemplateId in $inputOutputNodeTemplateSet)
+			<extensionActivity>
+				<bpel4RestLight:GET name="getNodeInstanceList"
+					accept="application/xml" response="nodeInstanceUrlList"
+					uri="$bpelvar[instanceDataAPIUrl]/nodeInstances?nodeTemplateID=$nodeTemplateId&amp;serviceInstanceID=$bpelvar[serviceInstanceId]" />
+			</extensionActivity>
+		
+			<!-- Select the node instance to be managed from the list - just one node 
+				instance expected in the list -->
+			<assign name="selectNodeInstanceIdFromList" validate="no">
+				<copy>
+					<from variable="nodeInstanceUrlList">
+						<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[string(//pp:NodeInstanceList/pp:nodeinstances/pp:link/@xlink:href)]]></query>
+					</from>
+					<to variable="nodeInstanceUrl_$nodeTemplateId" />
+				</copy>
+			</assign>
+		#end
+		
+		
+		
+		#foreach($inputNodeTemplateId in $taskInputSourceNodeTemplateSet)
+		<!-- Get properties of node instance and store it in the corresponding 
+			variable -->
+			<extensionActivity name="getNodeInstanceProperties_$inputNodeTemplateId">
+				<bpel4RestLight:GET accept="application/xml"
+					response="properties_$inputNodeTemplateId" 
+					uri="$bpelvar[nodeInstanceUrl_$inputNodeTemplateId]/properties" />
+			</extensionActivity>
+
+		#end
+
+		<!-- Create input message for task $mngmtTask.name -->
+		<assign name="createManagementOperationInput" validate="no">
+			<!-- Initialize input variable for asynch. call  -->
+			<copy>
+				<from>
+					<literal>
+						<impl:invokeOperationAsync xmlns:impl="http://siserver.org/schema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+							<impl:CsarID></impl:CsarID>
+		
+							<impl:ServiceTemplateIDNamespaceURI></impl:ServiceTemplateIDNamespaceURI>
+							<impl:ServiceTemplateIDLocalPart></impl:ServiceTemplateIDLocalPart>
+							<impl:InterfaceName></impl:InterfaceName>
+							<impl:NodeTemplateID></impl:NodeTemplateID>
+							<impl:OperationName></impl:OperationName>
+							<impl:ReplyTo/>
+							<impl:MessageID></impl:MessageID>
+							<impl:Params>
+								<!-- Create input parameters (payload) skeleton where the task input parameter values will be assigned to  -->
+								#foreach( $taskInput in $mngmtTaskInputList)
+									<impl:Param>
+		                                <impl:key>$taskInput.name</impl:key>
+		                                <impl:value></impl:value> 
+		                            </impl:Param>
+								#end	
+		                    </impl:Params>
+						</impl:invokeOperationAsync>
+					</literal>
+				</from>
+				<to variable="mangementOperationRequest" part="invokeOperationAsync" />
+			</copy> 
+			<copy>
+				<from variable="csarId" /> <!-- TODO frage an Olly: assigne dder hier jetzt nur den content oder die 
+					ganze variable mit tags, in BPELDesigner checken -->
+				<to variable="mangementOperationRequest" part="invokeOperationAsync">
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[string(//si:invokeOperationAsync/si:CsarID)]]></query>
+				</to>
+			</copy>
+			<copy>
+				<from>
+					<literal>
+						$mngmtTask.NodeTemplateId
+					</literal>
+				</from>
+				<to variable="mangementOperationRequest" part="invokeOperationAsync">
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[string(//si:invokeOperationAsync/si:NodeTemplateID)]]></query>
+				</to>
+			</copy>
+			<copy>
+				<from>
+					<literal>
+						$mngmtTask.InterfaceName
+					</literal>
+				</from>
+				<to variable="mangementOperationRequest" part="invokeOperationAsync">
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[string(//si:invokeOperationAsync/si:InterfaceName)]]></query>
+				</to>
+			</copy>
+			<copy>
+				<from>
+					<literal>
+						$mngmtTask.OperationName
+					</literal>
+				</from>
+				<to variable="mangementOperationRequest" part="invokeOperationAsync">
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[string(//si:invokeOperationAsync/si:OperationName)]]></query>
+				</to>
+			</copy>
+			<copy>
+				<from variable="serviceTemplateIdNamespaceURI" />
+				<to variable="mangementOperationRequest" part="invokeOperationAsync">
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[string(//si:invokeOperationAsync/si:ServiceTemplateIDNamespaceURI)]]></query>
+				</to>
+			</copy>
+			<copy>
+				<from variable="serviceTemplateIdLocalPart" />
+				<to variable="mangementOperationRequest" part="invokeOperationAsync">
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[string(//si:invokeOperationAsync/si:ServiceTemplateIDLocalPart)]]></query>
+				</to>
+			</copy>
+			<!-- The callback plan URL is provided in the message body and in the "ReplyTo" header TODO why in both?-->
+			<copy>
+				<from variable="planCallbackUrl" />
+				<to variable="mangementOperationRequest" part="invokeOperationAsync">
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()="ReplyTo" and namespace-uri()="http://siserver.org/schema"]]]></query>
+				</to>
+			</copy>
+			<copy>
+				<from variable="planCallbackUrl" />
+				<to variable="mangementOperationRequest" header="ReplyTo" />
+			</copy>
+			<copy>
+				<from> 
+				<!-- Generate unique message id used for correlation -->
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[string(generate-id())]]></query>
+				</from>
+				<to variable="mangementOperationRequest" part="invokeOperationAsync">
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[string(//si:invokeOperationAsync/si:MessageID)]]></query>
+				</to>
+			</copy>
+			<!-- Copy the property values from the node instances retrieved before, to the task input parameters  -->
+			#foreach($taskInputData in $mngmtTaskInputDataList)
+				<copy>
+					<from variable="properties_$taskInputData.nodeTemplate">
+						<!-- Select relevant property from node instance properties and add it to the parameters list -->
+						<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='$taskInputData.property']/text()]]></query>
+					</from>
+					<to  variable="mangementOperationRequest" part="invokeOperationAsync">
+						<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()="Param" and namespace-uri()="http://siserver.org/schema"]/*[local-name()="key" and text()="$taskInput.name"]/following-sibling::*[local-name()="value"]]]></bpel:query>
+					</to>
+				</copy>
+			#end
+			
+		</assign>
+		
+		<!-- Call Service Invoker asynchronously  -->
+		<invoke name="call_$mngmtTask.name"
+			inputVariable="mangementOperationRequest"
+			operation="invokeOperationAsync" 
+			partnerLink="serviceInvokerPL"
+			portType="si:InvokePortType">
+			<correlations>
+				<correlation initiate="join" set="ServiceInvokerCS" />
+			</correlations>
+		</invoke>
+		
+		<!-- Receive asynchronous response from Service Invoker  -->
+		<receive name="receive_$mngmtTask.name_response"
+			variable="mangementOperationResponse"
+			operation="callback" 
+			partnerLink="serviceInvokerPL" 
+			portType="si:CallbackPortType">
+			<correlations>
+				<correlation initiate="no" set="ServiceInvokerCS" />
+			</correlations>
+		</receive>
+		
+		#foreach($outputNodeTemplateId in $taskOutputTargetNodeTemplateSet)
+			<!-- Get properties of node instance and store it in the corresponding variable -->
+			<extensionActivity name="getNodeInstanceProperties_$outputNodeTemplateId ">
+				<bpel4RestLight:GET accept="application/xml"
+					response="properties_$outputNodeTemplateId " uri="$bpelvar[nodeInstanceUrl_$outputNodeTemplateId ]/properties" />
+			</extensionActivity>
+		#end
+		
+		
+		
+		<!--Copy result of management operation to variables representing properties of node template  -->
+		#foreach($taskOutputData in $taskOutputDataList)
+		<assign name="copyOutputProperty_$taskOutputData.property">
+			<copy>
+				<from variable="mangementOperationResponse">
+					<!-- Select relevant property from node instance properties and add it 
+						to the parameters list -->
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='$taskOutputData.name']/text()]]></query>
+				</from>
+				<to variable="properties_$taskOutputData.nodeTemplate">
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()="Param" and namespace-uri()="http://siserver.org/schema"]/*[local-name()="key" and text()="$taskOutputData.property"]/following-sibling::*[local-name()="value"]]]></bpel:query>
+				</to>
+			</copy>
+		</assign>
+		#end
+
+		<!-- Store result of management operation, i.e. node template properties in container -->
+		#foreach($outputNodeTemplateId in $taskOutputTargetNodeTemplateSet)
+			<bpel4RestLight:PUT accept="application/xml" 
+				request="properties_$nodeTemplateId" 
+				uri="$bpelvar[nodeInstanceUrl_$outputNodeTemplateId]/properties"/>
+		#end
+
+
+
+	</sequence>
+</scope>
