@@ -3,7 +3,15 @@
 <scope name="$mngmt_scope_name" xmlns:pp="http://opentosca.org/api/pp"
 	xmlns:xlink="http://www.w3.org/1999/xlink">
 
-	<!-- Template requires global variable 'serviceInstanceId' -->
+	<!-- Template requires global variable 'serviceInstanceId'
+	  -- Template defines following placeholders:
+	  -- $taskInputTargetNodeTemplateSet - All ids of node templates where input data for management operation are retrieved from
+	  -- $taskOutputTargetNodeTemplateSet - All ids of node templates where output data of management operation are written to
+	  -- $inputOutputNodeTemplateSet - All node template ids accessed by management operation, i.e. 
+	  -- 							   set union of $taskInputTargetNodeTemplateSet and $taskOutputTargetNodeTemplateSet
+	  -- $taskInputDataList - All input data of management operation
+	  -- $taskOutputDataList - All output data of management operation
+	  -->
 
 	<variables>
 		<!-- Must contain a <pp:nodeInstanceList> element with exactly one child 
@@ -13,24 +21,12 @@
 		<variable name="mangementOperationRequest" messageType="si:invokeOperationAsyncMessage" />
 		<variable name="mangementOperationResponse" messageType="si:invokeResponse" />
 		
-		<!--  Variables holding the URLs of node instances of node templates  -->
+		<!--  Variables holding the URLs of node instances of node templates and their properties  -->
 		#foreach($nodeTemplateId in $inputOutputNodeTemplateSet)
 			<variable name="nodeInstanceUrl_$nodeTemplateId" messageType="xsd:string" />
 			<variable name="properties_$nodeTemplateId" messageType="xsd:any" />
 		#end
-		
-		#foreach( $taskInputData in $taskInputDataList)
-			<variable name="$taskInputData.name" messageType="xsd:any" />
-		#end
-		
-<!-- 		#foreach($inputNodeTemplateId in $taskInputTargetNodeTemplateSet) -->
-<!-- 			<variable name="properties_$inputNodeTemplateId" messageType="xsd:any" /> -->
-<!-- 		#end -->
-		
-<!-- 		#foreach($outputNodeTemplateId in $taskOutputTargetNodeTemplateSet) -->
-<!-- 			<variable name="properties_$outputNodeTemplateId" messageType="xsd:any" /> -->
-<!-- 		#end -->
-
+	
 
 	</variables>
 	<sequence name="$mngmt_scope_seq_name">
@@ -234,11 +230,9 @@
 		<!-- Store result of management operation, i.e. node template properties in container -->
 		#foreach($outputNodeTemplateId in $taskOutputTargetNodeTemplateSet)
 			<bpel4RestLight:PUT accept="application/xml" 
-				request="properties_$nodeTemplateId" 
+				request="properties_$outputNodeTemplateId" 
 				uri="$bpelvar[nodeInstanceUrl_$outputNodeTemplateId]/properties"/>
 		#end
-
-
 
 	</sequence>
 </scope>

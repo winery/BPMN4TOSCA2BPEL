@@ -27,6 +27,8 @@
 				<complexType>
 					<sequence>
 						<element name="correlationId" type="string" />
+						<!-- Relevant if build plan was executed that created a new service instance -->
+						<element name="serviceInstanceId" type="string" />
 					</sequence>
 				</complexType>
 			</element>
