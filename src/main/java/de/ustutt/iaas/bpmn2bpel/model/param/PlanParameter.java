@@ -1,11 +1,19 @@
 package de.ustutt.iaas.bpmn2bpel.model.param;
 
 
+/**
+ * Copyright 2015 IAAS University of Stuttgart <br>
+ * <br>
+ * 
+ * @author Sebastian Wagner
+ *
+ */
 public class PlanParameter extends Parameter {
-	
+
 	private String startTaskName;
 	
 	private String parameterName;
+	
 
 	public String getStartTaskName() {
 		return startTaskName;

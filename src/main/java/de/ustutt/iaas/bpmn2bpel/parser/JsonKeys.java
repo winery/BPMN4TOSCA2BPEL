@@ -23,6 +23,8 @@ public interface JsonKeys {
 	
 	public static final String NODE_OPERATION = "node_operation";
 	
+	public static final String NODE_INTERFACE_NAME = "node_interface";
+	
 	public static final String CONNECTIONS = "connections";
 	
 	

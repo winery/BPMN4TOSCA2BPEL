@@ -1,10 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?>
+#foreach( $mngmtTask in $mngmtTaskList)
 
-<scope name="$mngmt_scope_name" xmlns:pp="http://opentosca.org/api/pp"
+#set( $taskName = $mngmtTask.getName() )
+#set( $taskInterface = $mngmtTask.getInterfaceName() )
+#set( $taskOperation = $mngmtTask.getNodeOperation() )
+#set( $taskNodeTemplate = $mngmtTask.getNodeTemplateId() )
+#set( $taskInputTargetNodeTemplateSet = $mngmtTask.getInputNodeTemplateIds() )
+#set( $taskOutputTargetNodeTemplateSet = $mngmtTask.getOutputNodeTemplateIds() )
+#set( $inputOutputNodeTemplateSet = $mngmtTask.getAllNodeTemplateIds()  )
+#set( $taskInputDataList  = $mngmtTask.getInputParameters() )
+#set( $taskOutputDataList  = $mngmtTask.getOutputParameters() )
+
+
+<scope name="${taskName}" xmlns:pp="http://opentosca.org/api/pp"
 	xmlns:xlink="http://www.w3.org/1999/xlink">
 
 	<!-- Template requires global variable 'serviceInstanceId'
 	  -- Template defines following placeholders:
+	  -- $mngmt_scope_name - Should become the name of the management task
 	  -- $taskInputTargetNodeTemplateSet - All ids of node templates where input data for management operation are retrieved from
 	  -- $taskOutputTargetNodeTemplateSet - All ids of node templates where output data of management operation are written to
 	  -- $inputOutputNodeTemplateSet - All node template ids accessed by management operation, i.e. 
@@ -29,7 +41,7 @@
 	
 
 	</variables>
-	<sequence name="$mngmt_scope_seq_name">
+	<sequence name="${taskName}_Sequence">
 
 	
 		<!-- Retrieve node instance URLs of instance of all nodes templates used either as input and output of this management operation -->
@@ -37,7 +49,7 @@
 			<extensionActivity>
 				<bpel4RestLight:GET name="getNodeInstanceList"
 					accept="application/xml" response="nodeInstanceUrlList"
-					uri="$bpelvar[instanceDataAPIUrl]/nodeInstances?nodeTemplateID=$nodeTemplateId&amp;serviceInstanceID=$bpelvar[serviceInstanceId]" />
+					uri="${bpelvar}[instanceDataAPIUrl]/nodeInstances?nodeTemplateID=$nodeTemplateId&amp;serviceInstanceID=${bpelvar}[serviceInstanceId]" />
 			</extensionActivity>
 		
 			<!-- Select the node instance to be managed from the list - just one node 
@@ -60,12 +72,12 @@
 			<extensionActivity name="getNodeInstanceProperties_$inputNodeTemplateId">
 				<bpel4RestLight:GET accept="application/xml"
 					response="properties_$inputNodeTemplateId" 
-					uri="$bpelvar[nodeInstanceUrl_$inputNodeTemplateId]/properties" />
+					uri="${bpelvar}[nodeInstanceUrl_$inputNodeTemplateId]/properties" />
 			</extensionActivity>
 
 		#end
 
-		<!-- Create input message for task $mngmtTask.name -->
+		<!-- Create input message for task $taskName -->
 		<assign name="createManagementOperationInput" validate="no">
 			<!-- Initialize input variable for asynch. call  -->
 			<copy>
@@ -105,7 +117,7 @@
 			<copy>
 				<from>
 					<literal>
-						$mngmtTask.NodeTemplateId
+						$taskNodeTemplate
 					</literal>
 				</from>
 				<to variable="mangementOperationRequest" part="invokeOperationAsync">
@@ -115,7 +127,7 @@
 			<copy>
 				<from>
 					<literal>
-						$mngmtTask.InterfaceName
+						$taskInterface
 					</literal>
 				</from>
 				<to variable="mangementOperationRequest" part="invokeOperationAsync">
@@ -125,7 +137,7 @@
 			<copy>
 				<from>
 					<literal>
-						$mngmtTask.OperationName
+						$taskOperation
 					</literal>
 				</from>
 				<to variable="mangementOperationRequest" part="invokeOperationAsync">
@@ -180,7 +192,7 @@
 		</assign>
 		
 		<!-- Call Service Invoker asynchronously  -->
-		<invoke name="call_$mngmtTask.name"
+		<invoke name="call_${taskName}"
 			inputVariable="mangementOperationRequest"
 			operation="invokeOperationAsync" 
 			partnerLink="serviceInvokerPL"
@@ -191,7 +203,7 @@
 		</invoke>
 		
 		<!-- Receive asynchronous response from Service Invoker  -->
-		<receive name="receive_$mngmtTask.name_response"
+		<receive name="receive_${taskName}_response"
 			variable="mangementOperationResponse"
 			operation="callback" 
 			partnerLink="serviceInvokerPL" 
@@ -205,7 +217,7 @@
 			<!-- Get properties of node instance and store it in the corresponding variable -->
 			<extensionActivity name="getNodeInstanceProperties_$outputNodeTemplateId ">
 				<bpel4RestLight:GET accept="application/xml"
-					response="properties_$outputNodeTemplateId " uri="$bpelvar[nodeInstanceUrl_$outputNodeTemplateId ]/properties" />
+					response="properties_$outputNodeTemplateId " uri="${bpelvar}[nodeInstanceUrl_$outputNodeTemplateId ]/properties" />
 			</extensionActivity>
 		#end
 		
@@ -231,8 +243,10 @@
 		#foreach($outputNodeTemplateId in $taskOutputTargetNodeTemplateSet)
 			<bpel4RestLight:PUT accept="application/xml" 
 				request="properties_$outputNodeTemplateId" 
-				uri="$bpelvar[nodeInstanceUrl_$outputNodeTemplateId]/properties"/>
+				uri="${bpelvar}[nodeInstanceUrl_$outputNodeTemplateId]/properties"/>
 		#end
 
 	</sequence>
 </scope>
+
+#end

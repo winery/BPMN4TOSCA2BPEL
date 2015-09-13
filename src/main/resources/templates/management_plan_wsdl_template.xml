@@ -70,9 +70,48 @@
 		</operation>
 	</portType>
 
-	<portType name="ManagementPlanClient">
+	<portType name="ManagementPlanClientPT">
 		<operation name="onResult">
 			<input message="tns:planOutputMessage" />
 		</operation>
 	</portType>
+	
+	
+	
+	
+	 <binding name="ManagementPlanPTBinding" type="tns:ManagementPlanPT">
+        <soap:binding style="document"
+    		transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="initiatePlan">
+            <soap:operation
+    			soapAction="http://iaas.uni-stuttgart.de/bpmn4tosca/managementplan/initiate"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+        </operation>
+    </binding>
+    <binding name="ManagementPlanClientPTBinding" type="tns:ManagementPlanClientPT">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="onResult">
+            <soap:operation
+    			soapAction="http://iaas.uni-stuttgart.de/bpmn4tosca/managementplan/onResult"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+        </operation>
+    </binding>
+
+
+    <service name="ManagementPlanService">
+        <port name="ManagementPlanPort" binding="tns:ManagementPlanPTBinding">
+    		<soap:address location="http://localhost:8080/ManagementPlan"/>
+        </port>
+    </service>
+    
+    <service name="ManagementPlanClientService">
+        <port name="ManagementPlanClientPort" binding="tns:ManagementPlanClientPTBinding">
+    		<soap:address location="http://localhost:8080/ManagementPlanClient"/>
+        </port>
+    </service>
+	
 </definitions>

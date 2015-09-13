@@ -1,7 +1,7 @@
 package de.ustutt.iaas.bpmn2bpel.parser;
 
+import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +18,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import de.ustutt.iaas.bpmn2bpel.model.EndTask;
-import de.ustutt.iaas.bpmn2bpel.model.Link;
 import de.ustutt.iaas.bpmn2bpel.model.ManagementFlow;
 import de.ustutt.iaas.bpmn2bpel.model.ManagementTask;
 import de.ustutt.iaas.bpmn2bpel.model.Node;
@@ -34,18 +32,20 @@ import de.ustutt.iaas.bpmn2bpel.model.param.StringParameter;
 import de.ustutt.iaas.bpmn2bpel.model.param.TopologyParameter;
 
 /**
+ * Copyright 2015 IAAS University of Stuttgart <br>
+ * <br>
  * 
  * TODO describe expected JSON format here
  * 
- * 
- * @author wagnerse
+ * @author Sebastian Wagner
+ *
  */
 public class BPMN4JsonParser extends Parser {
 
 	private static Logger log = LoggerFactory.getLogger(BPMN4JsonParser.class);
 
 	@Override
-	public ManagementFlow parse(URL jsonFileUrl) throws ParseException {
+	public ManagementFlow parse(URI jsonFileUrl) throws ParseException {
 
 		try {
 			// general method, same as with data binding
@@ -53,7 +53,7 @@ public class BPMN4JsonParser extends Parser {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
 			// (note: can also use more specific type, like ArrayNode or
 			// ObjectNode!)
-			JsonNode rootNode = mapper.readValue(jsonFileUrl, JsonNode.class);
+			JsonNode rootNode = mapper.readValue(jsonFileUrl.toURL(), JsonNode.class);
 
 			String prettyPrintedJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rootNode);
 			log.debug("Trying to create management flow from following Json model:" + prettyPrintedJson);
@@ -177,7 +177,7 @@ public class BPMN4JsonParser extends Parser {
 			while (inputParamIter.hasNext()) {
 				Map.Entry<String, JsonNode> inputParamEntry = (Map.Entry<String, JsonNode>) inputParamIter.next();
 				Parameter inputParam = createParameterFromJson(inputParamEntry.getKey(), inputParamEntry.getValue());
-				task.addInput(inputParam);
+				task.addInputParameter(inputParam);
 			}
 		} else {
 			log.debug("No input parameters found for node with id '" + taskId + "'");
@@ -190,7 +190,7 @@ public class BPMN4JsonParser extends Parser {
 			while (outputParamIter.hasNext()) {
 				Map.Entry<String, JsonNode> outputParamEntry = (Map.Entry<String, JsonNode>) outputParamIter.next();
 				Parameter outputParam = createParameterFromJson(outputParamEntry.getKey(), outputParamEntry.getValue());
-				task.addOutput(outputParam);
+				task.addOutputParameter(outputParam);
 			}
 
 		} else {
@@ -216,14 +216,16 @@ public class BPMN4JsonParser extends Parser {
 			return null;
 		}
 		String nodeTemplate = managementTaskNode.get(JsonKeys.NODE_TEMPLATE).asText();
+		String nodeInterfaceName = managementTaskNode.get(JsonKeys.NODE_INTERFACE_NAME).asText();
 		String nodeOperation = managementTaskNode.get(JsonKeys.NODE_OPERATION).asText();
 		
 		log.debug("Creating management task with id '" + managementTaskNode.get(JsonKeys.ID) + "', name '" + managementTaskNode.get(JsonKeys.NAME) 
 					+ "', node template '" + nodeTemplate + "', node operation '"+ "', node operation '" + nodeOperation + "'");
 		
 		ManagementTask task = new ManagementTask();
-		task.setNodeTemplate(nodeTemplate);
+		task.setNodeTemplateId(nodeTemplate);
 		task.setNodeOperation(nodeOperation);
+		task.setInterfaceName(nodeInterfaceName);
 		
 		return task;
 		

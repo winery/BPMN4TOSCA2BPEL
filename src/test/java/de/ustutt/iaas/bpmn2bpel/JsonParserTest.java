@@ -1,18 +1,27 @@
 package de.ustutt.iaas.bpmn2bpel;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 import de.ustutt.iaas.bpmn2bpel.model.EndTask;
+import de.ustutt.iaas.bpmn2bpel.model.Link;
 import de.ustutt.iaas.bpmn2bpel.model.ManagementFlow;
 import de.ustutt.iaas.bpmn2bpel.model.ManagementTask;
+import de.ustutt.iaas.bpmn2bpel.model.Node;
 import de.ustutt.iaas.bpmn2bpel.model.StartTask;
+import de.ustutt.iaas.bpmn2bpel.model.Task;
 import de.ustutt.iaas.bpmn2bpel.model.param.ConcatParameter;
 import de.ustutt.iaas.bpmn2bpel.model.param.DeploymentArtefactParameter;
 import de.ustutt.iaas.bpmn2bpel.model.param.ImplementationArtefactParameter;
@@ -22,7 +31,6 @@ import de.ustutt.iaas.bpmn2bpel.model.param.PlanParameter;
 import de.ustutt.iaas.bpmn2bpel.model.param.StringParameter;
 import de.ustutt.iaas.bpmn2bpel.model.param.TopologyParameter;
 import de.ustutt.iaas.bpmn2bpel.parser.BPMN4JsonParser;
-import de.ustutt.iaas.bpmn2bpel.parser.JsonKeys;
 import de.ustutt.iaas.bpmn2bpel.parser.ParseException;
 
 public class JsonParserTest {
@@ -36,20 +44,132 @@ public class JsonParserTest {
 	}
 
 	@Test
-	public void testParse() throws MalformedURLException, ParseException {
+	public void testParse() throws MalformedURLException, ParseException, URISyntaxException {
 		BPMN4JsonParser parser = new BPMN4JsonParser();
-		URL url = new URL("file:c:/temp/bpmn4tosca/bppmn4tosca.json");
+		URI uri = new URI("file:c:/temp/bpmn4tosca/bppmn4tosca.json");
 		//Path testBpmn4JsonFile = Paths.get("C:/temp/bpmn4tosca/bppmn4tosca.json");
-		ManagementFlow actualFlow = parser.parse(url);
+		ManagementFlow actualFlow = parser.parse(uri);
 		ManagementFlow expectedFlow = createReferenceFlow();
 		
-		assertEquals(expectedFlow.vertexSet().size(), actualFlow.vertexSet().size());
-		assertEquals(expectedFlow.edgeSet().size(), actualFlow.edgeSet().size());
+		assertNodeSets(expectedFlow.vertexSet(), actualFlow.vertexSet());
+		assertLinkSets(expectedFlow.edgeSet(), actualFlow.edgeSet());
+		
+	}
+	
+	public static void assertNodeSets(Set<Node> expectedNodes, Set<Node> actualNodes) {
+		assertEquals(expectedNodes.size(), actualNodes.size());
 		
 		
+		for (Iterator<Node> iterator = expectedNodes.iterator(); iterator.hasNext();) {
+			Node expectedNode = (Node) iterator.next();
+			Node actualNode =  getNodeById(expectedNode.getId(), actualNodes);
+			if (actualNode != null) {
+				assertNodes(expectedNode, actualNode);
+			} else {
+				fail("Node with id " + expectedNode.getId() + " could not be found");
+			}
+		}
+	}
+	
+	public static void assertLinkSets(Set<Link> expectedLinks, Set<Link> actualLinks) {
+		//assertEquals(expectedNodes.size(), actualNodes.size());
+		assertEquals(expectedLinks.size(), actualLinks.size());
 		
 		
 	}
+	
+	public static void assertLink(Link expectedLink, Link actualLink) {
+		assertEquals("Link source: id", expectedLink.getSource().getId(), actualLink.getSource().getId());
+		assertEquals("Link target :id", expectedLink.getTarget().getId(), actualLink.getTarget().getId());	
+	}
+	
+	private static Node getNodeById(String id, Set<Node> nodeSet) {
+		
+		Iterator<Node> iter = nodeSet.iterator();
+		while (iter.hasNext()) {
+			Node node = (Node) iter.next();
+			if (node.getId().equals(id)) {
+				return node;
+			}
+		}
+		return null;
+	}
+	
+	
+	public static void assertNodes(Node expected, Node actual) {
+		//assertEquals(expected.getId(), actual.getId());
+		assertEquals("node: id ", expected.getId(), actual.getId());
+		
+		/* Just tasks contain further properties that have to be tested */
+		if (expected instanceof Task) {
+			assertTasks((Task) expected, (Task) actual);	
+		}
+
+	}
+	
+	public static void assertTasks(Task expected, Task actual) {
+		assertEquals("Management node: id ", expected.getId(), actual.getId());
+		assertEquals("Management node: name", expected.getName(), actual.getName());
+		
+		if (expected instanceof StartTask) {
+			assertStartTask((StartTask) expected, (StartTask) actual);			 
+		} else if(expected instanceof EndTask) {
+			assertEndTask((EndTask) expected, (EndTask) actual);	
+		} else if(expected instanceof ManagementTask) {
+			assertMngmtTasks((ManagementTask) expected, (ManagementTask) actual);
+		} else {
+			fail("Task of type " + actual.getName() + " unknown");
+		}
+	}
+
+	public static void assertMngmtTasks(ManagementTask expected, ManagementTask actual) {
+		assertEquals("Management node: topology template", expected.getNodeTemplateId(), actual.getNodeTemplateId());
+		assertEquals("Management node: topology operation", expected.getNodeOperation(), actual.getNodeOperation());
+		assertParameters(expected.getInputParameters(), actual.getInputParameters());
+		assertParameters(expected.getOutputParameters(), actual.getOutputParameters());
+	}
+	
+	public static void assertStartTask(StartTask expected, StartTask actual) {
+		assertParameters(expected.getOutputParameters(), actual.getOutputParameters());
+	}
+	
+	public static void assertEndTask(EndTask expected, EndTask actual) {
+		assertParameters(expected.getInputParameters(), actual.getInputParameters());
+	}
+	
+	public static void assertParameters(List<Parameter> expected, List<Parameter> actual) {		
+		assertEquals("Number of parameters", expected.size(), actual.size());
+		
+		for (Iterator<Parameter> iterator = actual.iterator(); iterator.hasNext();) {
+			Parameter expectedParam = (Parameter) iterator.next();
+			Parameter actualParam = getParameterByName(expectedParam.getName(), actual);
+			if (actualParam != null) {
+				assertParameter(expectedParam, actualParam);
+			} else {
+				fail("Parameter with name " + expectedParam.getName() + " could not be found");
+			}
+		}
+	}
+	
+	public static void assertParameter(Parameter expected, Parameter actual) {		
+		assertEquals("Parameter: name", expected.getName(), actual.getName());
+		assertEquals("Parameter: type", expected.getType(), actual.getType());
+		assertEquals("Parameter: value", expected.getValue(), actual.getValue());
+	}
+	
+	
+	private static Parameter getParameterByName(String name, List<Parameter> parameters) {
+		
+		Iterator<Parameter> iter = parameters.iterator();
+		while (iter.hasNext()) {
+			Parameter param = (Parameter) iter.next();
+			if (param.getName().equals(name)) {
+				return param;
+			}
+		}
+		return null;
+	}
+	
 	
 	private static ManagementFlow createReferenceFlow() {
 		ManagementFlow flow = new ManagementFlow();
@@ -57,36 +177,37 @@ public class JsonParserTest {
 		StartTask startTask = new StartTask();
 		startTask.setId("element6");
 		startTask.setName("StartEvent");
-		startTask.addOutput(createParameter("SSHUserInput", ParamType.TOPOLOGY, ""));
+		startTask.addOutputParameter(createParameter("SSHUserInput", ParamType.TOPOLOGY, ""));
 		flow.addVertex(startTask);
 		
 		
 		ManagementTask createEC2Task = new ManagementTask();
 		createEC2Task.setId("element10");
 		createEC2Task.setName("CreateVMAmazonEC2");
-		createEC2Task.setNodeTemplate("AmazonEC2");
+		createEC2Task.setNodeTemplateId("AmazonEC2");
 		createEC2Task.setNodeOperation("CreateVM");
-		createEC2Task.addInput(createParameter("Size", ParamType.STRING ,"t1.medium"));
-		createEC2Task.addInput(createParameter("SSHUser", ParamType.PLAN ,"StartEvent.SSHUserInput"));
-		createEC2Task.addInput(createParameter("SSHKey", ParamType.STRING ,"myKey"));
-		createEC2Task.addInput(createParameter("ImageID", ParamType.TOPOLOGY ,"UbuntuVM.ImageID"));
-		createEC2Task.addInput(createParameter("AccountUser", ParamType.STRING ,""));
-		createEC2Task.addInput(createParameter("AccountPassword", ParamType.STRING ,""));
+		createEC2Task.addInputParameter(createParameter("Size", ParamType.STRING ,"t1.medium"));
+		createEC2Task.addInputParameter(createParameter("SSHUser", ParamType.PLAN ,"StartEvent.SSHUserInput"));
+		createEC2Task.addInputParameter(createParameter("SSHKey", ParamType.STRING ,"myKey"));
+		createEC2Task.addInputParameter(createParameter("ImageID", ParamType.TOPOLOGY ,"UbuntuVM.ImageID"));
+		createEC2Task.addInputParameter(createParameter("AccountUser", ParamType.STRING ,""));
+		createEC2Task.addInputParameter(createParameter("AccountPassword", ParamType.STRING ,""));
+		createEC2Task.addOutputParameter(createParameter("IPAddress", ParamType.TOPOLOGY ,"UbuntuVM.IPAddress"));
 		flow.addVertex(createEC2Task);
 		
 		ManagementTask runUbuntuTask = new ManagementTask();
 		runUbuntuTask.setId("element38");
 		runUbuntuTask.setName("runScriptUbuntuVM");
-		runUbuntuTask.setNodeTemplate("UbuntuVM");
+		runUbuntuTask.setNodeTemplateId("UbuntuVM");
 		runUbuntuTask.setNodeOperation("runScript");
-		runUbuntuTask.addInput(createParameter("script", ParamType.IA ,"{http://www.opentosca.org}ApacheWebserverInstallImplementation"));
-		runUbuntuTask.addOutput(createParameter("result", ParamType.TOPOLOGY ,""));
+		runUbuntuTask.addInputParameter(createParameter("script", ParamType.IA ,"{http://www.opentosca.org}ApacheWebserverInstallImplementation"));
+		runUbuntuTask.addOutputParameter(createParameter("result", ParamType.TOPOLOGY ,""));
 		flow.addVertex(runUbuntuTask);
 
 		EndTask endTask = new EndTask();
 		endTask.setId("element45");
 		endTask.setName("EndEvent");
-		endTask.addInput(createParameter("AppURL", ParamType.CONCAT ,"http://,UbuntuVM.IPAddress,:8080/,PHPApplication.ID"));
+		endTask.addInputParameter(createParameter("AppURL", ParamType.CONCAT ,"http://,UbuntuVM.IPAddress,:8080/,PHPApplication.ID"));
 		flow.addVertex(endTask);
 		
 		
