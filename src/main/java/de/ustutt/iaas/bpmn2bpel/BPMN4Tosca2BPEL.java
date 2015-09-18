@@ -6,6 +6,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.ustutt.iaas.bpmn2bpel.model.ManagementFlow;
 import de.ustutt.iaas.bpmn2bpel.parser.BPMN4JsonParser;
 import de.ustutt.iaas.bpmn2bpel.parser.ParseException;
@@ -27,6 +30,8 @@ public class BPMN4Tosca2BPEL {
 	public static final String DIR_NAME_TEMP_BPMN4TOSCA = "bpmn4tosca";
 	
 	
+	private static Logger log = LoggerFactory.getLogger(BPMN4Tosca2BPEL.class);
+	
 	/**
 	 * Transforms the given BPMN4Tosca Json management into a BPEL management plan that can be enacted with the OpenTosca runtime.
 	 * <p> 
@@ -43,13 +48,12 @@ public class BPMN4Tosca2BPEL {
 	 * @param srcBpmn4ToscaJsonFile
 	 * @param targetBPELArchive
 	 *
-	 * @return
 	 * @throws ParseException
 	 * @throws PlanWriterException
 	 */
-	public URI transform(URI srcBpmn4ToscaJsonFile, URI targetBPELArchive) throws ParseException, PlanWriterException {
-		//get model
-		//plan snippets
+	public void transform(URI srcBpmn4ToscaJsonFile, URI targetBPELArchive) throws ParseException, PlanWriterException {
+		//log.debug("Transforming ");
+		
 		BPMN4JsonParser parser = new BPMN4JsonParser();//Todo Statisch machen
 		ManagementFlow managementFlow = parser.parse(srcBpmn4ToscaJsonFile);
 		
@@ -76,13 +80,13 @@ public class BPMN4Tosca2BPEL {
 			planArtefactPaths.add(FileUtil.writeStringToFile(deploymentDesc, Paths.get(tempPath.toString(), FILE_NAME_DEPLOYMENT_DESC)));
 			
 			FileUtil.createApacheOdeProcessArchive(Paths.get(targetBPELArchive), planArtefactPaths);
+			/* Delete create plan artifact files */
+			FileUtil.deleteFiles(planArtefactPaths);
 		} catch (Exception e) {
 			throw new PlanWriterException(e);
 		}
 		
-		
-		
-		return null;
+		 
 	}
 	
 	

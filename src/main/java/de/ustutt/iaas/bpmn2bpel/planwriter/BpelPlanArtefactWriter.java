@@ -9,6 +9,8 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.jgrapht.traverse.DepthFirstIterator;
 import org.jgrapht.traverse.GraphIterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.ustutt.iaas.bpmn2bpel.model.Link;
 import de.ustutt.iaas.bpmn2bpel.model.ManagementFlow;
@@ -21,6 +23,8 @@ public class BpelPlanArtefactWriter {
 	
 	public static String TEMPLATE_PATH = "./src/main/resources/templates/";
 	
+	private static Logger log = LoggerFactory.getLogger(BpelPlanArtefactWriter.class);
+	
 	public BpelPlanArtefactWriter(ManagementFlow mangagementFlow) {
 		this.mangagementFlow = mangagementFlow;
 		Velocity.init();
@@ -28,6 +32,7 @@ public class BpelPlanArtefactWriter {
 	
 	
 	public String completePlanTemplate() {
+		log.debug("Completing BPEL process template"); 
 		
 		/* Traverse  the management flow and add the management tasks in the order of their execution to a list */
 		List<ManagementTask> managementTaskSeq = new ArrayList<ManagementTask>();
@@ -49,21 +54,33 @@ public class BpelPlanArtefactWriter {
 		StringWriter planWriter = new StringWriter();
 		planTemplate.merge( context, planWriter );
 		
-		return planWriter.toString();
+		String bpelProcessContent = planWriter.toString();
+		
+		log.debug("Completed BPEL process template" + bpelProcessContent); 
+		
+		return bpelProcessContent;
 		
 	}
 	
 	public String completePlanWsdlTemplate() {
+		log.debug("Completing BPEL WSDL template");
+		
 		VelocityContext context = new VelocityContext();
 		Template wsdlTemplate = Velocity.getTemplate(TEMPLATE_PATH + "management_plan_wsdl_template.xml");
 		
 		StringWriter wsdlWriter = new StringWriter();
 		wsdlTemplate.merge( context, wsdlWriter );
 		
-		return wsdlWriter.toString();
+		String bpelProcessWSDL = wsdlWriter.toString();
+		
+		log.debug("Completed BPEL WSDL template" + bpelProcessWSDL); 
+		
+		return bpelProcessWSDL;
 	}
 	
 	public String completeInvokerWsdlTemplate() {
+		log.debug("Retrieving service invoker WSDL");
+		
 		VelocityContext context = new VelocityContext();
 		Template invokerWsdlTemplate = Velocity.getTemplate(TEMPLATE_PATH + "invoker.wsdl");
 		
@@ -74,6 +91,8 @@ public class BpelPlanArtefactWriter {
 	}
 	
 	public String completeInvokerXsdTemplate() {
+		log.debug("Retrieving service invoker XSD");
+		
 		VelocityContext context = new VelocityContext();
 		Template invokerXsdTemplate = Velocity.getTemplate(TEMPLATE_PATH + "invoker.xsd");
 		
@@ -84,6 +103,8 @@ public class BpelPlanArtefactWriter {
 	}
 	
 	public String completeDeploymentDescriptorTemplate() {
+		log.debug("Retrieving Apache ODE deployment descriptor");
+		
 		VelocityContext context = new VelocityContext();
 		Template invokerXsdTemplate = Velocity.getTemplate(TEMPLATE_PATH + "deploy.xml");
 		

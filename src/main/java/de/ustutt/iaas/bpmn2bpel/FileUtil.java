@@ -13,6 +13,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Copyright 2015 IAAS University of Stuttgart <br>
  * <br>
@@ -23,6 +26,8 @@ import java.util.Map;
  * 		
  */
 public class FileUtil {
+	
+	private static Logger log = LoggerFactory.getLogger(FileUtil.class);
 	
 	public static Path createTempDir(String subdirectory) throws IOException {
 		
@@ -37,10 +42,11 @@ public class FileUtil {
 	}
 	
 	public static Path writeStringToFile(String content, Path targetPath) throws IOException {
-		return Files.write(targetPath, content.getBytes(), StandardOpenOption.CREATE);
+		return Files.write(targetPath, content.getBytes(), StandardOpenOption.CREATE_NEW);
 	}
 	
 	public static Path createApacheOdeProcessArchive(Path zipFilePath, List<Path> filePaths) throws IOException {
+		log.debug("Creating BPEL process archive for Apache ODE");
 		
 		URI uri = URI.create("jar:file:" + zipFilePath.toUri().getPath());
 		
@@ -52,12 +58,22 @@ public class FileUtil {
 			/* Iterate over files and add them to the zip */
 			for (Path src : filePaths) {
 				if (!Files.isDirectory(src)) {
+					log.debug("Adding file " + src.getFileName() + " to process archive");
 					Path dest = zipFileSystem.getPath(src.getFileName().toString());
 					Files.copy(src, dest, StandardCopyOption.REPLACE_EXISTING);
 				}	
 			}
 		}
 		return zipFilePath;
+	}
+	
+	public static void deleteFiles(List<Path> filePaths) throws IOException {
+		for (Path src : filePaths) {
+			if (!Files.isDirectory(src)) {
+				log.debug("Deleting file " + src.toAbsolutePath());
+				Files.delete(src);
+			}	
+		}
 	}
 	
 }

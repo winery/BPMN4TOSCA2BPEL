@@ -7,13 +7,14 @@
 	targetNamespace="http://iaas.uni-stuttgart.de/bpmn4tosca/managementplan/"
 	xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
 	xmlns:bpel4RestLight="http://iaas.uni-stuttgart.de/bpel/extensions/bpel4restlight"
-	xmlns:si="http://siserver.org/wsdl"  >
+	xmlns:si="http://siserver.org/wsdl"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
 
-	<import importType="http://schemas.xmlsoap.org/wsdl/" location="service_invoker_wsdl"
+	<import importType="http://schemas.xmlsoap.org/wsdl/" location="invoker.wsdl"
 		namespace="http://siserver.org/wsdl" />
-	<import importType="http://www.w3.org/2001/XMLSchema" location="service_invoker_xsd"
+	<import importType="http://www.w3.org/2001/XMLSchema" location="invoker.xsd"
 		namespace="http://siserver.org/schema" /> <!-- TODO externalize NS -->
-	<import importType="http://schemas.xmlsoap.org/wsdl/" location="managementPlan.wsdl"
+	<import importType="http://schemas.xmlsoap.org/wsdl/" location="management_plan.wsdl"
 		namespace="http://iaas.uni-stuttgart.de/bpmn4tosca/managementplan/" /> <!-- Todo place_holder wsdl and namespace -->
 
 	<extensions>
@@ -37,26 +38,26 @@
     </correlationSets>
 
 	<variables>
-		<variable name="input" messageType="tns:PlanInputMessage" />
+		<variable name="input" messageType="tns:planInputMessage" />
 		<variable name="output" messageType="tns:planOutputMessage" />
-		<variable name="instanceDataAPIUrl" messageType="xsd:string" />
+		<variable name="instanceDataAPIUrl" type="xsd:string" />
 
 		<!-- The values for these variables must be provided in the instantiating 
 			input message -->
 		<variable name="containerAPIServiceInstanceURL" type="xsd:string" />
-		<variable name="csarId" messageType="xsd:string" />
-		<variable name="serviceTemplateIdNamespaceURI" messageType="xsd:string" />
-		<variable name="serviceTemplateIdLocalPart" messageType="xsd:string" />
-		<variable name="serviceInstanceId" messageType="xsd:string" />
-		<variable name="correlationId" messageType="xsd:string" />
-		<variable name="planCallbackUrl" messageType="xsd:string" />
+		<variable name="csarId" type="xsd:string" />
+		<variable name="serviceTemplateIdNamespaceURI" type="xsd:string" />
+		<variable name="serviceTemplateIdLocalPart" type="xsd:string" />
+		<variable name="serviceInstanceId" type="xsd:string" />
+		<variable name="correlationId" type="xsd:string" />
+		<variable name="planCallbackUrl" type="xsd:string" />
 		
 		
 		<!-- Variable to store service instance -->
-		<variable name="serviceInstanceData" messageType="xsd:any" />
+		<variable name="serviceInstanceData" type="xsd:any" />
 		
 		<!-- Derived from serviceTemplateIdNamespaceURI and serviceTemplateIdLocalPart -->
-		<variable name="serviceTemplateId" messageType="xsd:string" />
+		<variable name="serviceTemplateId" type="xsd:string" />
 		
 		<!-- Variable to store service invoker requests and responses -->
 		<variable name="siAsynchInput" messageType="si:invokeOperationAsyncMessage" />
@@ -73,44 +74,44 @@
 		<assign name="initFromInputMsg" validate="no">
 			<copy>
 				<from variable="input" part="payload">
-					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='instanceDataAPIUrl']/text()]]></query>
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='instanceDataAPIUrl']]]></query>
 				</from>
 				<to variable="instanceDataAPIUrl" />
 			</copy>
 			<copy>
 				<from variable="input" part="payload">
-					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='csarId']/text()]]></query>
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='csarId']]]></query>
 				</from>
 				<to variable="csarId" />
 			</copy>
 			<copy>
 				<from variable="input" part="payload">
-					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='serviceTemplateIdNamespaceURI']/text()]]></query>
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='serviceTemplateIdNamespaceURI']]]></query>
 				</from>
 				<to variable="serviceTemplateIdNamespaceURI" />
 			</copy>
 			<copy>
 				<from variable="input" part="payload">
-					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='serviceTemplateIdLocalPart']/text()]]></query>
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='serviceTemplateIdLocalPart']]]></query>
 				</from>
 				<to variable="serviceTemplateIdLocalPart" />
 			</copy>
 			<copy>
 				<!-- Derive service template id -->
 				<from>
-					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[concat('{', ${bpelvar}[serviceTemplateIdNamespaceURI], '}', ${bpelvar}[serviceTemplateIdLocalPart])]]></query>
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[string(concat('{', ${bpelvar}[serviceTemplateIdNamespaceURI]/text(), '}', ${bpelvar}[serviceTemplateIdLocalPart]/text()))]]></query>
 				</from>
 				<to variable="serviceTemplateId" />
 			</copy>
 			<copy>
 				<from variable="input" part="payload">
-					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='serviceInstanceId']/text()]]></query>
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='serviceInstanceId']]]></query>
 				</from>
 				<to variable="serviceInstanceId" />
 			</copy>
 			<copy>
 				<from variable="input" part="payload">
-					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='planCallbackUrl']/text()]]></query>
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='planCallbackUrl']]]></query>
 				</from>
 				<to variable="planCallbackUrl" />
 			</copy>
@@ -123,18 +124,18 @@
 			<condition expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0">
 				<![CDATA[string-length(${bpelvar}[serviceInstanceId]/text()) = 0]]>
 			</condition>
-			<sequence>
-				<bpel4RestLight:POST accept="application/xml" 
-				response="serviceInstanceId" 
-				uri="${bpelvar}[containerAPIServiceInstanceURL]/serviceInstances?csarID=${bpelvar}[csarId]&amp;serviceTemplateID=${bpelvar}[serviceTemplateId]"/>
-			</sequence>
+				<extensionActivity>
+					<bpel4RestLight:POST accept="application/xml" 
+					response="serviceInstanceId" 
+					uri="${bpelvar}[containerAPIServiceInstanceURL]/serviceInstances?csarID=${bpelvar}[csarId]&amp;serviceTemplateID=${bpelvar}[serviceTemplateId]"/>
+				</extensionActivity>
 		</if>
-		
-		<bpel4RestLight:GET name="getServiceInstanceData"
-			accept="application/xml" 
-			response="serviceInstanceData" 
-			uri="${bpelvar}[containerAPIServiceInstanceURL]/serviceInstances?csarID=${bpelvar}[csarId]&amp;serviceTemplateID=${bpelvar}[serviceTemplateId]"/>
-		
+		<extensionActivity>
+			<bpel4RestLight:GET name="getServiceInstanceData"
+				accept="application/xml" 
+				response="serviceInstanceData" 
+				uri="${bpelvar}[containerAPIServiceInstanceURL]/serviceInstances?csarID=${bpelvar}[csarId]&amp;serviceTemplateID=${bpelvar}[serviceTemplateId]"/>
+		</extensionActivity>
 		
 		<!-- Perform management operations -->
 		#parse( "/src/main/resources/templates/bpel_management_activity_scope_template.xml" )
@@ -144,13 +145,13 @@
 			<copy>
 				<from variable="correlationId" />
 				<to variable="output" part="payload">
-					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='correlationId']/text()]]></query>
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='correlationId']]]></query>
 				</to>
 			</copy>
 			<copy>
 				<from variable="serviceInstanceId" />
 				<to variable="output" part="payload">
-					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='serviceInstanceId']/text()]]></query>
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='serviceInstanceId']]]></query>
 				</to>
 			</copy>
 		</assign>

@@ -64,7 +64,7 @@ public class ManagementTaskTemplateWrapper extends ManagementTask {
 	private Set<String> getNodeTemplateIds(List<Parameter> parameters) {
 		Set<String> nodeTemplateIds = new HashSet<String>();
 		
-		Iterator<Parameter> iter = getInputParameters().iterator();
+		Iterator<Parameter> iter = parameters.iterator();
 		while (iter.hasNext()) {
 			Parameter parameter = (Parameter) iter.next();
 			/* Just topology parameter refer to node templates */

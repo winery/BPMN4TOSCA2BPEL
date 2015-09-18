@@ -1,8 +1,10 @@
 package de.ustutt.iaas.bpmn2bpel;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Paths;
 
 import org.junit.After;
 import org.junit.Before;
@@ -24,8 +26,8 @@ public class BPMN4Tosca2BpelTest {
 	
 	@Test
 	public void testTransform() throws ParseException, PlanWriterException, MalformedURLException, URISyntaxException {
-		URI srcUrl = new URI("file:C:/Users/wagnerse/Documents/OpenTOSCA/BPMN4TOSCA2BPEL/BPMN4TOSCA2BPEL/src/test/resources/bpmn4tosca/bppmn4tosca.json");
-		URI targetUrl = new URI("file:C:/temp/bpmn4tosca/plan/");
+		URI srcUrl = new URI("file:/C:/Users/wagnerse/Documents/OpenTOSCA/BPMN4TOSCA2BPEL/BPMN4TOSCA2BPEL/src/test/resources/bpmn4tosca/bppmn4tosca.json");
+		URI targetUrl = new URI("file:/C:/temp/bpmn4tosca/plan/managementplan.zip");
 		
 		BPMN4Tosca2BPEL transformer = new BPMN4Tosca2BPEL();
 		transformer.transform(srcUrl, targetUrl);

@@ -5,7 +5,8 @@
 	xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype"
 	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop"
 	xmlns:si="http://siserver.org/wsdl" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-
+	
+	<import namespace="http://siserver.org/wsdl" location="invoker.wsdl"/>
 	<types>
 		<schema attributeFormDefault="unqualified" elementFormDefault="qualified"
 			targetNamespace="http://iaas.uni-stuttgart.de/bpmn4tosca/managementplan/"
@@ -70,7 +71,7 @@
 		</operation>
 	</portType>
 
-	<portType name="ManagementPlanClientPT">
+	<portType name="ManagementPlanClientCallbackPT">
 		<operation name="onResult">
 			<input message="tns:planOutputMessage" />
 		</operation>

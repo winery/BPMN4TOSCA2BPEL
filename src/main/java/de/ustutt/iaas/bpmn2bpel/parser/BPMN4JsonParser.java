@@ -56,7 +56,7 @@ public class BPMN4JsonParser extends Parser {
 			JsonNode rootNode = mapper.readValue(jsonFileUrl.toURL(), JsonNode.class);
 
 			String prettyPrintedJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rootNode);
-			log.debug("Trying to create management flow from following Json model:" + prettyPrintedJson);
+			log.debug("Creating management flow from following Json model:" + prettyPrintedJson);
 			
 			ManagementFlow managementFlow = new ManagementFlow();
 			/* Contains the ids (values) of the target nodes of a certain node
