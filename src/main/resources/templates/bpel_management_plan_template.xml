@@ -159,12 +159,12 @@
 					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='serviceInstanceId']/text()]]></query>
 				</to>
 			</copy>
-		<!-- 	<copy>
+		 	<copy>
                 <from header="ReplyTo" variable="input">
                     <query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0"><![CDATA[//*[local-name()='Address']/text()]]></query>
                 </from>
                 <to endpointReference="partnerRole" partnerLink="clientPL"/>
-            </copy>  -->	
+            </copy>  	
 		</assign>
 		<invoke name="callbackClient" inputVariable="output" operation="onResult"
 			partnerLink="clientPL" portType="tns:ManagementPlanClientCallbackPT" />

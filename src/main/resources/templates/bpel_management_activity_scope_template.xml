@@ -165,10 +165,10 @@
 					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()="ReplyTo" and namespace-uri()="http://siserver.org/schema"]]]></query>
 				</to>
 			</copy>
-			<!-- <copy>
+			 <copy>
 				<from variable="planCallbackUrl" />
 				<to variable="mangementOperationRequest" header="ReplyTo" />
-			</copy>  -->
+			</copy>  
 			<copy>
 				<!-- Generate unique message id used for correlation -->
 				<from> 
