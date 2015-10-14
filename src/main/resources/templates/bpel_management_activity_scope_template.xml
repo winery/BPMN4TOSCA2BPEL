@@ -28,7 +28,7 @@
 	<variables>
 		<!-- Must contain a <pp:nodeInstanceList> element with exactly one child 
 			<pp::nodeinstances> which contains exactly one child named <pp:link href="nodeInstanceId"> -->
-		<variable name="nodeInstanceUrlList" type="xsd:any" /> <!-- TODO set correct type -->
+		<variable name="nodeInstanceUrlList" type="xsd:anyType" /> <!-- TODO set correct type -->
 		<variable name="nodeInstanceUrl" type="xsd:string" />
 		<variable name="mangementOperationRequest" messageType="si:invokeOperationAsyncMessage" />
 		<variable name="mangementOperationResponse" messageType="si:invokeResponse" />
@@ -36,7 +36,7 @@
 		<!--  Variables holding the URLs of node instances of node templates and their properties  -->
 		#foreach($nodeTemplateId in $inputOutputNodeTemplateSet)
 			<variable name="nodeInstanceUrl_$nodeTemplateId" type="xsd:string" />
-			<variable name="properties_$nodeTemplateId" type="xsd:any" />
+			<variable name="properties_$nodeTemplateId" type="xsd:anyType" />
 		#end
 	
 
@@ -165,14 +165,14 @@
 					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()="ReplyTo" and namespace-uri()="http://siserver.org/schema"]]]></query>
 				</to>
 			</copy>
-			<copy>
+			<!-- <copy>
 				<from variable="planCallbackUrl" />
 				<to variable="mangementOperationRequest" header="ReplyTo" />
-			</copy>
+			</copy>  -->
 			<copy>
-				<from> 
 				<!-- Generate unique message id used for correlation -->
-					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[string(generate-id())]]></query>
+				<from> 
+					$ode:pid
 				</from>
 				<to variable="mangementOperationRequest" part="invokeOperationAsync">
 					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//si:invokeOperationAsync/si:MessageID]]></query>
@@ -243,9 +243,11 @@
 
 		<!-- Store result of management operation, i.e. node template properties in container -->
 		#foreach($outputNodeTemplateId in $taskOutputTargetNodeTemplateSet)
-			<bpel4RestLight:PUT accept="application/xml" 
-				request="properties_$outputNodeTemplateId" 
-				uri="${bpelvar}[nodeInstanceUrl_$outputNodeTemplateId]/properties"/>
+			<extensionActivity>
+				<bpel4RestLight:PUT accept="application/xml" 
+					request="properties_$outputNodeTemplateId" 
+					uri="${bpelvar}[nodeInstanceUrl_$outputNodeTemplateId]/properties"/>
+			</extensionActivity>
 		#end
 
 	</sequence>
