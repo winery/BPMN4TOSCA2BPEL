@@ -16,10 +16,7 @@
 			namespace="http://iaas.uni-stuttgart.de/bpel/extensions/bpel4restlight" />
 	</extensions>
 	
-<!-- 	<import importType="http://schemas.xmlsoap.org/wsdl/" location="invoker.wsdl"
-		namespace="http://siserver.org/wsdl" />
-	<import importType="http://www.w3.org/2001/XMLSchema" location="invoker.xsd"
-		namespace="http://siserver.org/schema" />  --> <!-- TODO externalize NS --> 
+
 	<import importType="http://schemas.xmlsoap.org/wsdl/" location="management_plan.wsdl"
 		namespace="http://iaas.uni-stuttgart.de/bpmn4tosca/managementplan/" /> <!-- Todo place_holder wsdl and namespace -->
 
@@ -79,7 +76,7 @@
 		<assign name="initFromInputMsg" validate="no">
 			<copy>
 				<from variable="input" part="payload">
-					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='instanceDataAPIUrl']/text()]]></query>
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='containerAPIServiceInstanceURL']/text()]]></query>
 				</from>
 				<to variable="instanceDataAPIUrl" />
 			</copy>
@@ -104,7 +101,7 @@
 			<copy>
 				<!-- Derive service template id -->
 				<from>
-					ode:combine-url($serviceTemplateIdNamespaceURI/text(), $serviceTemplateIdLocalPart/text())
+					<literal>129.69.209.127</literal>
 				</from>
 				<to variable="serviceTemplateId" />
 			</copy>
@@ -127,7 +124,7 @@
 		     Hence, a service instance has to be created  before excuting management operations -->
 		<if> 
 			<condition expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0">
-				string-length(${serviceInstanceId}/text()) = 0
+				<![CDATA[$serviceInstanceId=""]]>
 			</condition>
 				<extensionActivity>
 					<bpel4RestLight:POST accept="application/xml" 

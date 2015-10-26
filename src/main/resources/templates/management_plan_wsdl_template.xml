@@ -4,7 +4,8 @@
 	xmlns:tns="http://iaas.uni-stuttgart.de/bpmn4tosca/managementplan/"
 	xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype"
 	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop"
-	xmlns:si="http://siserver.org/wsdl" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	xmlns:si="http://siserver.org/wsdl" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	>
 
 	<import namespace="http://siserver.org/wsdl" location="invoker.wsdl" />
 	<types>
@@ -15,7 +16,7 @@
 				<complexType>
 					<sequence>
 						<element name="containerAPIServiceInstanceURL" type="string" />
-						<element name="csarId" type="string" />
+						<element name="csarId" type="xsd:string" />
 						<element name="serviceTemplateIdNamespaceURI" type="string" />
 						<element name="serviceTemplateIdLocalPart" type="string" />
 						<element name="serviceInstanceId" type="string" />
