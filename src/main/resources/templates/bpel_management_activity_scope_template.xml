@@ -49,7 +49,7 @@
 			<extensionActivity>
 				<bpel4RestLight:GET name="getNodeInstanceList"
 					accept="application/xml" response="nodeInstanceUrlList"
-					uri="${bpelvar}[instanceDataAPIUrl]/nodeInstances?nodeTemplateID=$nodeTemplateId&amp;serviceInstanceID=${bpelvar}[serviceInstanceId]" />
+					uri="${bpelvar}[containerAPIServiceInstanceURL]/nodeInstances?nodeTemplateID=$nodeTemplateId&amp;serviceInstanceID=${bpelvar}[serviceInstanceId]" />
 			</extensionActivity>
 		
 			<!-- Select the node instance to be managed from the list - just one node 
@@ -75,7 +75,7 @@
 					accept="application/xml"
 					response="properties_$inputNodeTemplateId" 
 					uri="${bpelvar}[nodeInstanceUrl_$inputNodeTemplateId]/properties" />
-			</extensionActivity>
+			</extensionActivity> 
 
 		#end
 
@@ -217,10 +217,10 @@
 		
 		#foreach($outputNodeTemplateId in $taskOutputTargetNodeTemplateSet)
 			<!-- Get properties of node instance and store it in the corresponding variable -->
-			<extensionActivity>
+		<!-- 	<extensionActivity>
 				<bpel4RestLight:GET accept="application/xml" name="getNodeInstanceProperties_$outputNodeTemplateId"
 					response="properties_$outputNodeTemplateId " uri="${bpelvar}[nodeInstanceUrl_$outputNodeTemplateId ]/properties" />
-			</extensionActivity>
+			</extensionActivity>  -->
 		#end
 		
 		
@@ -243,11 +243,11 @@
 
 		<!-- Store result of management operation, i.e. node template properties in container -->
 		#foreach($outputNodeTemplateId in $taskOutputTargetNodeTemplateSet)
-			<extensionActivity>
+		<!--	<extensionActivity>
 				<bpel4RestLight:PUT accept="application/xml" 
 					request="properties_$outputNodeTemplateId" 
 					uri="${bpelvar}[nodeInstanceUrl_$outputNodeTemplateId]/properties"/>
-			</extensionActivity>
+			</extensionActivity> -->
 		#end
 
 	</sequence>

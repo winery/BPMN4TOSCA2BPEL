@@ -42,6 +42,8 @@
 			input message -->
 		<variable name="containerAPIServiceInstanceURL" type="xsd:string" />
 		<variable name="csarId" type="xsd:string" />
+	    <!-- TODO: Should be derived from serviceTemplateIdNamespaceURI and serviceTemplateIdLocalPart (or vice versa) -->
+		<variable name="serviceTemplateId" type="xsd:string" />
 		<variable name="serviceTemplateIdNamespaceURI" type="xsd:string" />
 		<variable name="serviceTemplateIdLocalPart" type="xsd:string" />
 		<variable name="serviceInstanceId" type="xsd:string" />
@@ -52,8 +54,7 @@
 		<!-- Variable to store service instance -->
 		<variable name="serviceInstanceData" type="xsd:anyType" />
 		
-		<!-- Derived from serviceTemplateIdNamespaceURI and serviceTemplateIdLocalPart -->
-		<variable name="serviceTemplateId" type="xsd:string" />
+
 		
 		<!-- Variable to store service invoker requests and responses -->
 		<variable name="siAsynchInput" messageType="si:invokeOperationAsyncMessage" />
@@ -78,13 +79,19 @@
 				<from variable="input" part="payload">
 					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='containerAPIServiceInstanceURL']/text()]]></query>
 				</from>
-				<to variable="instanceDataAPIUrl" />
+				<to variable="containerAPIServiceInstanceURL" />
 			</copy>
 			<copy>
 				<from variable="input" part="payload">
 					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='csarId']/text()]]></query>
 				</from>
 				<to variable="csarId" />
+			</copy>
+			<copy>
+				<from variable="input" part="payload">
+					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='serviceTemplateId']/text()]]></query>
+				</from>
+				<to variable="serviceTemplateId" />
 			</copy>
 			<copy>
 				<from variable="input" part="payload">
@@ -98,19 +105,12 @@
 				</from>
 				<to variable="serviceTemplateIdLocalPart" />
 			</copy>
-			<copy>
-				<!-- Derive service template id -->
-				<from>
-					<literal>129.69.209.127</literal>
-				</from>
-				<to variable="serviceTemplateId" />
-			</copy>
-			<copy>
+			<!-- <copy>
 				<from variable="input" part="payload">
 					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='serviceInstanceId']/text()]]></query>
 				</from>
-				<to variable="serviceInstanceId" />
-			</copy>
+				<to variable="serviceInstanceId" />  
+			</copy> -->
 			<copy>
 				<from variable="input" part="payload">
 					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='planCallbackUrl']/text()]]></query>
@@ -124,20 +124,30 @@
 		     Hence, a service instance has to be created  before excuting management operations -->
 		<if> 
 			<condition expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0">
-				<![CDATA[$serviceInstanceId=""]]>
+				boolean($input/payload/planInput/serviceInstanceId/text()[1])
 			</condition>
+				<assign>
+					<copy>
+						<from variable="input" part="payload">
+							<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()='serviceInstanceId']/text()]]></query>
+						</from>
+						<to variable="serviceInstanceId" />
+					</copy>
+				</assign>
+			<else>
 				<extensionActivity>
-					<bpel4RestLight:POST accept="application/xml" 
+					<bpel4RestLight:POST accept="application/xml" name="createServiceInstance" 
 					response="serviceInstanceId" 
 					uri="${bpelvar}[containerAPIServiceInstanceURL]/serviceInstances?csarID=${bpelvar}[csarId]&amp;serviceTemplateID=${bpelvar}[serviceTemplateId]"/>
 				</extensionActivity>
+			</else>
 		</if>
-		<extensionActivity>
+		 <extensionActivity>
 			<bpel4RestLight:GET name="getServiceInstanceData"
 				accept="application/xml" 
 				response="serviceInstanceData" 
 				uri="${bpelvar}[containerAPIServiceInstanceURL]/serviceInstances?csarID=${bpelvar}[csarId]&amp;serviceTemplateID=${bpelvar}[serviceTemplateId]"/>
-		</extensionActivity>
+		</extensionActivity> 
 		
 		<!-- Perform management operations -->
 		#parse( "/src/main/resources/templates/bpel_management_activity_scope_template.xml" )

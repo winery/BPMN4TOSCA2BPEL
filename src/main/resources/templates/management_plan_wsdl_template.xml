@@ -17,6 +17,8 @@
 					<sequence>
 						<element name="containerAPIServiceInstanceURL" type="string" />
 						<element name="csarId" type="xsd:string" />
+						<!-- TODO: Should be derived from serviceTemplateIdNamespaceURI and serviceTemplateIdLocalPart (or vice versa) -->
+						<element name="serviceTemplateId" type="string" />
 						<element name="serviceTemplateIdNamespaceURI" type="string" />
 						<element name="serviceTemplateIdLocalPart" type="string" />
 						<element name="serviceInstanceId" type="string" />
