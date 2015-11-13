@@ -80,7 +80,7 @@ public class BPMN4Tosca2BPEL {
 			planArtefactPaths.add(FileUtil.writeStringToFile(deploymentDesc, Paths.get(tempPath.toString(), FILE_NAME_DEPLOYMENT_DESC)));
 			
 			FileUtil.createApacheOdeProcessArchive(Paths.get(targetBPELArchive), planArtefactPaths);
-			/* Delete create plan artifact files */
+			/* Delete created plan artifact files from temp directory */
 			FileUtil.deleteFiles(planArtefactPaths);
 		} catch (Exception e) {
 			throw new PlanWriterException(e);

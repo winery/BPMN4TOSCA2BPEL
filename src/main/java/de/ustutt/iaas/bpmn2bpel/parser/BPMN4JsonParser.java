@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.namespace.QName;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -223,7 +225,7 @@ public class BPMN4JsonParser extends Parser {
 					+ "', node template '" + nodeTemplate + "', node operation '"+ "', node operation '" + nodeOperation + "'");
 		
 		ManagementTask task = new ManagementTask();
-		task.setNodeTemplateId(nodeTemplate);
+		task.setNodeTemplateId(QName.valueOf(nodeTemplate));
 		task.setNodeOperation(nodeOperation);
 		task.setInterfaceName(nodeInterfaceName);
 		

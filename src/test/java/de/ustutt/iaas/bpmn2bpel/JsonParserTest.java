@@ -11,6 +11,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.namespace.QName;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -184,7 +186,7 @@ public class JsonParserTest {
 		ManagementTask createEC2Task = new ManagementTask();
 		createEC2Task.setId("element10");
 		createEC2Task.setName("CreateVMAmazonEC2");
-		createEC2Task.setNodeTemplateId("AmazonEC2");
+		createEC2Task.setNodeTemplateId(QName.valueOf("{http://tempUri.org}AmazonEC2"));
 		createEC2Task.setNodeOperation("CreateVM");
 		createEC2Task.addInputParameter(createParameter("Size", ParamType.STRING ,"t1.medium"));
 		createEC2Task.addInputParameter(createParameter("SSHUser", ParamType.PLAN ,"StartEvent.SSHUserInput"));
@@ -198,7 +200,7 @@ public class JsonParserTest {
 		ManagementTask runUbuntuTask = new ManagementTask();
 		runUbuntuTask.setId("element38");
 		runUbuntuTask.setName("runScriptUbuntuVM");
-		runUbuntuTask.setNodeTemplateId("UbuntuVM");
+		runUbuntuTask.setNodeTemplateId(QName.valueOf("{http://tempUri.org}UbuntuVM")); 
 		runUbuntuTask.setNodeOperation("runScript");
 		runUbuntuTask.addInputParameter(createParameter("script", ParamType.IA ,"{http://www.opentosca.org}ApacheWebserverInstallImplementation"));
 		runUbuntuTask.addOutputParameter(createParameter("result", ParamType.TOPOLOGY ,""));

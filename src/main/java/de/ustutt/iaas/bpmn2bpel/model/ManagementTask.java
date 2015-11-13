@@ -1,5 +1,6 @@
 package de.ustutt.iaas.bpmn2bpel.model;
 
+import javax.xml.namespace.QName;
 
 /**
  * Copyright 2015 IAAS University of Stuttgart <br>
@@ -12,15 +13,15 @@ public class ManagementTask extends Task {
 	
 	private String interfaceName;;
 	
-	private String nodeTemplateId;
+	private QName nodeTemplateId;
 	
 	private String nodeOperation;
 
-	public String getNodeTemplateId() {
+	public QName getNodeTemplateId() {
 		return nodeTemplateId;
 	}
 
-	public void setNodeTemplateId(String nodeTemplateId) {
+	public void setNodeTemplateId(QName nodeTemplateId) {
 		this.nodeTemplateId = nodeTemplateId;
 	}
 

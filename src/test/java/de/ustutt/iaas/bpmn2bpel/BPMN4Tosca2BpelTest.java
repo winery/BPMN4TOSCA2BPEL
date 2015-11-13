@@ -26,7 +26,7 @@ public class BPMN4Tosca2BpelTest {
 	
 	@Test
 	public void testTransform() throws ParseException, PlanWriterException, MalformedURLException, URISyntaxException {
-		URI srcUrl = new URI("file:/C:/Users/wagnerse/Documents/OpenTOSCA/BPMN4TOSCA2BPEL/BPMN4TOSCA2BPEL/src/test/resources/bpmn4tosca/bppmn4tosca.json");
+		URI srcUrl = new URI("file:/C:/Users/wagnerse/Documents/OpenTOSCA/BPMN4TOSCA2BPEL/BPMN4TOSCA2BPEL/src/test/resources/bpmn4tosca/managementPlan.json");
 		URI targetUrl = new URI("file:/C:/temp/bpmn4tosca/plan/managementplan.zip");
 		
 		BPMN4Tosca2BPEL transformer = new BPMN4Tosca2BPEL();

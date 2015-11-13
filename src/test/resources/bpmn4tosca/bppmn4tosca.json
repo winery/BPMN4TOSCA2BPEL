@@ -23,14 +23,14 @@
     }
   },
   {
-    "name": "CreateVMAmazonEC2",
+    "name": "CreateAmazonEC2Task",
     "position": {
       "left": 302,
       "top": 346
     },
-    "type": "ToscaNodeManagementTask",
-    "node_template": "AmazonEC2",
-    "node_interface": "AmazonEC2Interface",
+    "type": "AmazonEC2NodeType",
+    "node_template": "AmazonEC2NodeTemplate",
+    "node_interface": "ec2Interface",
     "connections": [
       "element38"
     ],
@@ -40,60 +40,37 @@
       "Size": {
         "type": "string",
         "value": "t1.medium"
-      },
-      "SSHUser": {
-        "type": "plan",
-        "value": "StartEvent.SSHUserInput"
-      },
-      "SSHKey": {
-        "type": "string",
-        "value": "StartEvent.SSHUserKey"
-      },
-      "ImageID": {
-        "type": "topology",
-        "value": "UbuntuVM.ImageID"
-      },
-      "AccountUser": {
-        "type": "string",
-        "value": "StartEvent.AccountUser"
-      },
-      "AccountPassword": {
-        "type": "string",
-        "value": "StartEvent.AccountPassword"
       }
     },
     "output": {
-      "IPAddress": {
+      "ipAddress": {
         "type": "topology",
-        "value": "UbuntuVM.IPAddress"
+        "value": "AmazonEC2NodeTemplate.ipAddress"
       }
     }
   },
   {
-    "name": "runScriptUbuntuVM",
+    "name": "InstallUbuntutTask",
     "position": {
       "left": 597,
       "top": 347
     },
-    "type": "ToscaNodeManagementTask",
-    "node_interface": "UbunutuInterface",
-    "node_template": "UbuntuVM",
+    "type": "UbuntuNodeType",
+    "node_interface": "ubunutuInterface",
+    "node_template": "UbuntuNodeTemplate",
     "connections": [
       "element45"
     ],
     "id": "element38",
-    "node_operation": "runScript",
+    "node_operation": "installUbuntu",
     "input": {
-      "script": {
-        "type": "implementation_artifact",
-        "value": "{http://www.opentosca.org}ApacheWebserverInstallImplementation"
+      "ipAddress": {
+        "type": "topology",
+        "value": "AmazonEC2NodeTemplate.ipAddress"
       }
     },
     "output": {
-      "result": {
-        "type": "topology",
-        "value": "Script.ResultCode"
-      }
+      
     }
   },
   {
