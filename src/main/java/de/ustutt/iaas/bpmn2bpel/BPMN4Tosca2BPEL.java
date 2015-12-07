@@ -1,5 +1,6 @@
 package de.ustutt.iaas.bpmn2bpel;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -57,11 +58,11 @@ public class BPMN4Tosca2BPEL {
 		BPMN4JsonParser parser = new BPMN4JsonParser();//Todo Statisch machen
 		ManagementFlow managementFlow = parser.parse(srcBpmn4ToscaJsonFile);
 		
-		
+		List<Path> planArtefactPaths = new ArrayList<Path>();
 		try {
 			Path tempPath = FileUtil.createTempDir(DIR_NAME_TEMP_BPMN4TOSCA);
 			
-			List<Path> planArtefactPaths = new ArrayList<Path>();
+			
 			BpelPlanArtefactWriter writer = new BpelPlanArtefactWriter(managementFlow);
 			
 			String plan = writer.completePlanTemplate();
@@ -79,11 +80,18 @@ public class BPMN4Tosca2BPEL {
 			String deploymentDesc = writer.completeDeploymentDescriptorTemplate();
 			planArtefactPaths.add(FileUtil.writeStringToFile(deploymentDesc, Paths.get(tempPath.toString(), FILE_NAME_DEPLOYMENT_DESC)));
 			
+			log.debug("Creating BPEL Archive...");
 			FileUtil.createApacheOdeProcessArchive(Paths.get(targetBPELArchive), planArtefactPaths);
-			/* Delete created plan artifact files from temp directory */
-			FileUtil.deleteFiles(planArtefactPaths);
 		} catch (Exception e) {
 			throw new PlanWriterException(e);
+		} finally {
+			/* Delete created plan artifact files from temp directory */
+			try {
+				log.debug("Deleting temporary plan artefact files...");
+				FileUtil.deleteFiles(planArtefactPaths);
+			} catch (IOException e) {
+				throw new PlanWriterException(e);
+			}
 		}
 		
 		 
