@@ -10,7 +10,7 @@
 	</xs:complexType>
 	<xs:complexType name="ParamsMap">
 		<xs:sequence>
-			<xs:element maxOccurs="unbounded" name="Param"
+			<xs:element minOccurs="0" maxOccurs="unbounded" name="Param"
 				type="ns:ParamsMapItemType" />
 		</xs:sequence>
 	</xs:complexType>

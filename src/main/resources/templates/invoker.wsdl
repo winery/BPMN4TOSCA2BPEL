@@ -100,10 +100,13 @@
 			</wsdl:input>
 		</wsdl:operation>
 	</wsdl:binding>
+	<!--  Note, in original invoker.wsdl the service element was hosting InvokerPort and CallbackPort. This resulted in crashes of the Apache ODE (WSO2 BPS) as it only distinguishes bey service name -->
 	<wsdl:service name="InvokerService">
 		<wsdl:port binding="tns:InvokeBinding" name="InvokePort">
 			<soap:address location="http://localhost:8081/invoker" />
 		</wsdl:port>
+	</wsdl:service>
+	<wsdl:service name="CallbackService">
 		<wsdl:port binding="tns:CallbackBinding" name="CallbackPort">
 			<soap:address location="http://localhost:8088/callback" />
 		</wsdl:port>

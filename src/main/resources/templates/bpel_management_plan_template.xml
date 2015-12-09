@@ -10,16 +10,14 @@
 	xmlns:xlink="http://www.w3.org/1999/xlink"
 	xmlns:ode="http://www.apache.org/ode/type/extension">
 
+<import namespace="http://siserver.org/wsdl" location="invoker.wsdl" importType="http://schemas.xmlsoap.org/wsdl/"></import>
+	<import importType="http://schemas.xmlsoap.org/wsdl/" location="management_plan.wsdl"
+		namespace="http://iaas.uni-stuttgart.de/bpmn4tosca/managementplan/" /> <!-- Todo place_holder wsdl and namespace -->
+
 	<extensions>
 		<extension mustUnderstand="yes"
 			namespace="http://iaas.uni-stuttgart.de/bpel/extensions/bpel4restlight" />
 	</extensions>
-
-
-	<import importType="http://schemas.xmlsoap.org/wsdl/" location="management_plan.wsdl"
-		namespace="http://iaas.uni-stuttgart.de/bpmn4tosca/managementplan/" /> <!-- Todo place_holder wsdl and namespace -->
-
-
 
 	<partnerLinks>
 		<partnerLink name="clientPL" initializePartnerRole="yes"
@@ -28,8 +26,8 @@
 
 		<partnerLink name="serviceInvokerPL"
 			initializePartnerRole="yes" partnerLinkType="tns:OpenTOSCAServiceInvokerPLT"
-			myRole="ServiceInvokerClient" partnerRole="ServiceInvoker" />
-	</partnerLinks>
+			myRole="ServiceInvokerClient"  partnerRole="ServiceInvoker"  />	
+	</partnerLinks> 
 
 	<variables>
 		<variable name="input" messageType="tns:planInputMessage" />
@@ -60,6 +58,10 @@
 		<!-- Variable to store service invoker requests and responses -->
 		<variable name="siAsynchInput" messageType="si:invokeOperationAsyncMessage" />
 		<variable name="siResponse" messageType="si:invokeResponse" />
+		
+		<!--  Variables for debugging purposes -->
+		<variable name="dbg_mangementOperationRequest" messageType="si:invokeOperationAsyncMessage" />
+		
 	</variables>
 
 	<correlationSets>
