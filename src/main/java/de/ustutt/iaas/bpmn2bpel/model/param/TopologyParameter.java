@@ -2,8 +2,6 @@ package de.ustutt.iaas.bpmn2bpel.model.param;
 
 import javax.xml.namespace.QName;
 
-import com.sun.xml.internal.ws.util.StringUtils;
-
 /**
  * Copyright 2015 IAAS University of Stuttgart <br>
  * <br>
