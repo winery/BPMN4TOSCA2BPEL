@@ -28,7 +28,7 @@
       "left": 302,
       "top": 346
     },
-    "type": "AmazonEC2NodeType",
+    "type": "ToscaNodeManagementTask",
     "node_template": "AmazonEC2NodeTemplate",
     "node_interface": "ec2Interface",
     "connections": [
@@ -55,7 +55,7 @@
       "left": 597,
       "top": 347
     },
-    "type": "UbuntuNodeType",
+    "type": "ToscaNodeManagementTask",
     "node_interface": "ubunutuInterface",
     "node_template": "UbuntuNodeTemplate",
     "connections": [
