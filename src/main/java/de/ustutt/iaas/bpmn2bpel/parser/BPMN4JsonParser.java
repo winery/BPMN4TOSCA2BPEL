@@ -108,11 +108,19 @@ public class BPMN4JsonParser extends Parser {
 						.next();
 				String srcNodeId = inputParamEntry.getKey();
 				Node srcNode = managementFlow.getNode(srcNodeId);
+				if (srcNode == null) {
+					throw new Exception("Node with id '" + srcNodeId + "' could not be found in the management flow.");
+				}
+				
 				/* Relate the source node with its link targets */
 				Iterator<String> nodeTargetIdsIter = inputParamEntry.getValue().iterator();
 				while (nodeTargetIdsIter.hasNext()) {
 					String targetNodeId = (String) nodeTargetIdsIter.next();
-					Node targetNode = managementFlow.getNode(targetNodeId);
+					Node targetNode = managementFlow.getNode(targetNodeId); 
+					if (targetNode == null) {
+						throw new Exception("Node with id '" + targetNodeId + "' could not be found in the management flow.");
+					}
+					
 					log.debug("Creating link between node with id '" + srcNodeId + "' and target node with id '"
 							+ targetNodeId + "'");
 					managementFlow.addEdge(srcNode, targetNode);
