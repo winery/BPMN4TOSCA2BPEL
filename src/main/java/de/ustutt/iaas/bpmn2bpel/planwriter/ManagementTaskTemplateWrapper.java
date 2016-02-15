@@ -44,54 +44,13 @@ public class ManagementTaskTemplateWrapper extends ManagementTask {
 		return new ArrayList<QName>(getNodeTemplateIds(getInputParameters())); 
 	}
 	
-//	public List<String> getInputNodeTemplateIdsAsLocalNames() {
-//		// Velocity does just support java lists in templates but not sets; 
-//		List<String> localNames = new ArrayList<String>();
-//		Iterator<QName> iter = getNodeTemplateIds(getInputParameters()).iterator();
-//		
-//		while (iter.hasNext()) {
-//			localNames.add(iter.next().getLocalPart());
-//		}
-//		return localNames;
-//	}
+
 	
 	public List<QName> getOutputNodeTemplateIds() {
 		// Velocity does just support java lists in templates but not sets; 
 				return new ArrayList<QName>(getNodeTemplateIds(getOutputParameters())); 
 	}
-	
-//	public List<String> getOutputNodeTemplateIdsAsLocalNames() {
-//		// Velocity does just support java lists in templates but not sets; 
-//		List<String> localNames = new ArrayList<String>();
-//		Iterator<QName> iter = getNodeTemplateIds(getOutputParameters()).iterator();
-//		
-//		while (iter.hasNext()) {
-//			localNames.add(iter.next().getLocalPart());
-//		}
-//		return localNames;
-//	}
-	
-//	public List<String> getAllNodeTemplateIdsAsQNames() {
-//		List<String> qnamesAsString = new ArrayList<String>();
-//		Iterator<QName> iter = getAllNodeTemplateIds().iterator();
-//		
-//		while (iter.hasNext()) {
-//			qnamesAsString.add(iter.next().toString());
-//		}
-//		return qnamesAsString;
-//		
-//	}
-	
-//	public List<String> getAllNodeTemplateIdsAsLocalNames() {
-//		List<String> localNames = new ArrayList<String>();
-//		Iterator<QName> iter = getAllNodeTemplateIds().iterator();
-//		
-//		while (iter.hasNext()) {
-//			localNames.add(iter.next().getLocalPart());
-//		}
-//		return localNames;
-//		
-//	}
+
 	
 	/**
 	 * @return The set union of all ids of node templates used by the task.

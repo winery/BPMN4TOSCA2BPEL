@@ -32,7 +32,7 @@ public class BpelPlanArtefactWriter {
 	
 	
 	public String completePlanTemplate() {
-		log.debug("Completing BPEL process template"); 
+		log.debug("Completing BPEL process template..."); 
 		
 		/* Traverse  the management flow and add the management tasks in the order of their execution to a list */
 		List<ManagementTask> managementTaskSeq = new ArrayList<ManagementTask>();
@@ -49,6 +49,8 @@ public class BpelPlanArtefactWriter {
 		
 		
 		VelocityContext context = new VelocityContext();
+		/* In the Velocity template for each management task an own scope is created containing the variables and 
+		 * activities required to perform the management task based on the properties of the respective task  */
 		Template planTemplate = Velocity.getTemplate(TEMPLATE_PATH + "bpel_management_plan_template.xml");
 		context.put("mngmtTaskList", managementTaskSeq);
 		StringWriter planWriter = new StringWriter();

@@ -55,7 +55,8 @@ public class BPMN4Tosca2BPEL {
 	public void transform(URI srcBpmn4ToscaJsonFile, URI targetBPELArchive) throws ParseException, PlanWriterException {
 		//log.debug("Transforming ");
 		
-		BPMN4JsonParser parser = new BPMN4JsonParser();//Todo Statisch machen
+		BPMN4JsonParser parser = new BPMN4JsonParser();//TODO To singleton
+		/* Create object representation of Json */
 		ManagementFlow managementFlow = parser.parse(srcBpmn4ToscaJsonFile);
 		
 		List<Path> planArtefactPaths = new ArrayList<Path>();
@@ -81,7 +82,8 @@ public class BPMN4Tosca2BPEL {
 			planArtefactPaths.add(FileUtil.writeStringToFile(deploymentDesc, Paths.get(tempPath.toString(), FILE_NAME_DEPLOYMENT_DESC)));
 			
 			log.debug("Creating BPEL Archive...");
-			FileUtil.createApacheOdeProcessArchive(Paths.get(targetBPELArchive), planArtefactPaths);
+			Path zipFilePath = FileUtil.createApacheOdeProcessArchive(Paths.get(targetBPELArchive), planArtefactPaths);
+			log.debug("Management plan zip file saved to " + zipFilePath.toString());
 		} catch (Exception e) {
 			throw new PlanWriterException(e);
 		} finally {

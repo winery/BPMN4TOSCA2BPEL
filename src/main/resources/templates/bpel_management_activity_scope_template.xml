@@ -195,18 +195,33 @@
 					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//sischema:invokeOperationAsync/sischema:MessageID]]></query>
 				</to>
 			</copy>
-			<!-- Copy the property values from the node instances retrieved before, to the inputVariable mangementOperationRequest being used as request message for the task  -->
-			#foreach($taskInputData in $taskInputDataList)
-				#set( $nodeTemplateIdLocalName = $taskInputData.nodeTemplateId.getLocalPart())
-				<copy>
-					<from variable="properties_$nodeTemplateIdLocalName">
-						<!-- Select relevant property from node instance properties and add it to the parameters list -->
-						<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[string(//*[local-name()='$taskInputData.property'])]]></query>
-					</from>
-					<to  variable="mangementOperationRequest" part="invokeOperationAsync">
-						<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()="Param" and namespace-uri()="http://siserver.org/schema"]/*[local-name()="key" and text()="$taskInput.name"]/following-sibling::*[local-name()="value"]]]></query>
-					</to>
-				</copy>
+			<!-- Copy blocks to assign parameter values.-->
+			#foreach($taskInput in $taskInputDataList)
+				#set( $paramType = $taskInput.getType().toString())
+				#if ( $paramType == "STRING")
+					<!-- Assign string parameter value -->
+					<copy>
+						<from variable="properties_$nodeTemplateIdLocalName">
+							<!-- Select relevant property from node instance properties and add it to the parameters list -->
+							<literal>$taskInput.value</literal>
+						</from>
+						<to  variable="mangementOperationRequest" part="invokeOperationAsync">
+							<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()="Param" and namespace-uri()="http://siserver.org/schema"]/*[local-name()="key" and text()="$taskInput.name"]/following-sibling::*[local-name()="value"]]]></query>
+						</to>
+					</copy>
+				#elseif ( $paramType == "TOPOLOGY")
+					#set( $nodeTemplateIdLocalName = $taskInputData.nodeTemplateId.getLocalPart())
+					<!-- Assign topology parameter value -->
+					<copy>
+						<from variable="properties_$nodeTemplateIdLocalName">
+							<!-- Select relevant property from node instance properties and add it to the parameters list -->
+							<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[string(//*[local-name()='$taskInput.property'])]]></query>
+						</from>
+						<to  variable="mangementOperationRequest" part="invokeOperationAsync">
+							<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//*[local-name()="Param" and namespace-uri()="http://siserver.org/schema"]/*[local-name()="key" and text()="$taskInput.name"]/following-sibling::*[local-name()="value"]]]></query>
+						</to>
+					</copy>
+				#end
 			#end
 		</assign>
 		
