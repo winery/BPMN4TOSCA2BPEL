@@ -127,7 +127,7 @@
 			created before excuting management operations -->
 		<if>
 			<condition expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0">
-				boolean($input/payload/planInput/serviceInstanceId/text()[1])
+				boolean($input.payload/*[local-name()='serviceInstanceId']/text()[1])
 			</condition>
 			<assign>
 				<copy>
