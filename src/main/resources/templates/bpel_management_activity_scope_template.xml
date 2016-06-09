@@ -148,7 +148,7 @@
 			<copy>
 				<from>
 					<literal>
-						$taskNodeTemplate
+						$nodeTemplateIdLocalName
 					</literal>
 				</from>
 				<to variable="mangementOperationRequest" part="invokeOperationAsync">
