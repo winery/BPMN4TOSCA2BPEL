@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Paths;
 
 import org.junit.After;
 import org.junit.Before;
@@ -52,7 +53,7 @@ public class BpelPlanArtefactWriterTest {
 	@Test
 	public void testWritePlan() throws MalformedURLException, ParseException, URISyntaxException {
 		BPMN4JsonParser parser = new BPMN4JsonParser();
-		URI uri = new URI("file:C:/Users/wagnerse/Documents/OpenTOSCA/BPMN4TOSCA2BPEL/BPMN4TOSCA2BPEL/src/test/resources/bpmn4tosca/bppmn4tosca.json");
+		URI uri = Paths.get("src/test/resources/bpmn4tosca/bppmn4tosca.json").toUri();
 		//Path testBpmn4JsonFile = Paths.get("C:/temp/bpmn4tosca/bppmn4tosca.json");
 		ManagementFlow mngmtFlow = parser.parse(uri);
 		

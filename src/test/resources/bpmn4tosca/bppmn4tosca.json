@@ -30,7 +30,7 @@
     },
     "type": "ToscaNodeManagementTask",
     "node_template": "AmazonEC2NodeTemplate",
-    "node_interface": "ec2Interface",
+    "interface": "ec2Interface",
     "connections": [
       "element38"
     ],
@@ -56,7 +56,7 @@
       "top": 347
     },
     "type": "ToscaNodeManagementTask",
-    "node_interface": "ubunutuInterface",
+    "interface": "ubunutuInterface",
     "node_template": "UbuntuNodeTemplate",
     "connections": [
       "element45"
