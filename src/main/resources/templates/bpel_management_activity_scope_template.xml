@@ -127,12 +127,12 @@
 					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//sischema:invokeOperationAsync/sischema:ServiceInstanceID]]></query>
 				</to>
 			</copy>
-			<copy>
+		<!-- 	<copy>
 				<from variable="nodeInstanceUrl_$nodeTemplateIdLocalName" />
 				<to variable="mangementOperationRequest" part="invokeOperationAsync">
 					<query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[//sischema:invokeOperationAsync/sischema:NodeInstanceID]]></query>
 				</to>
-			</copy>
+			</copy>  -->
 			<copy>
 				<from variable="serviceTemplateIdNamespaceURI" />
 				<to variable="mangementOperationRequest" part="invokeOperationAsync">
