@@ -31,8 +31,6 @@ public class BPMN4Tosca2BpelTest {
 	public void testTransform() throws ParseException, PlanWriterException, MalformedURLException, URISyntaxException {
 		URI srcUri = Paths.get(RESOURCES_DIR, "bppmn4tosca.json").toUri();
 		URI targetUri = Paths.get(RESOURCES_DIR, "managementplan.zip").toUri();
-		//URI srcUrl = new URI("file:///Users/wagnerse/Documents/OpenTOSCA/BPMN4TOSCA2BPEL/BPMN4TOSCA2BPEL/src/test/resources/echo/echoplan_setup_vm.json");
-		//URI targetUrl = new URI("file:///Users/wagnerse/Documents/Echo/managementplan.zip");
 		BPMN4Tosca2BpelTest.class.getResource(".");
 		BPMN4Tosca2BPEL transformer = new BPMN4Tosca2BPEL();
 		transformer.transform(srcUri, targetUri); 
