@@ -251,7 +251,7 @@ public class BPMN4JsonParser extends Parser {
 		String paramType = paramNode.get(JsonKeys.TYPE).asText();
 		String paramValue = paramNode.get(JsonKeys.VALUE).asText();
 
-		log.debug("Parsing JSON parameter node with of type '" + paramType + "' and value '" + paramValue + "'");
+		log.debug("Parsing JSON parameter node with name '" + paramName + "', type '" + paramType + "' and value '" + paramValue + "'");
 
 		Parameter param = null;
 		switch (paramType) {

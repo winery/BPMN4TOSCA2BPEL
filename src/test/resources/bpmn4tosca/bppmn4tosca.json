@@ -40,7 +40,28 @@
       "Size": {
         "type": "string",
         "value": "t1.medium"
+      },
+      "SSHUser": {
+        "type": "plan",
+        "value": "StartEvent.SSHUserInput"
+      },
+      "SSHKey": {
+        "type": "string",
+        "value": "myKey"
+      },
+      "ImageID": {
+        "type": "topology",
+        "value": "UbuntuVM.ImageID"
+      },
+      "AccountUser": {
+        "type": "string",
+        "value": ""
+      },
+      "AccountPassword": {
+        "type": "string",
+        "value": ""
       }
+
     },
     "output": {
       "ipAddress": {
@@ -64,13 +85,16 @@
     "id": "element38",
     "node_operation": "installUbuntu",
     "input": {
-      "ipAddress": {
-        "type": "topology",
-        "value": "AmazonEC2NodeTemplate.ipAddress"
+      "script": {
+        "type": "implementation_artifact",
+        "value": "{http://www.opentosca.org}ApacheWebserverInstallImplementation"
       }
     },
     "output": {
-      
+      "result": {
+        "type": "string",
+        "value": ""
+      }
     }
   },
   {

@@ -37,6 +37,8 @@ import de.ustutt.iaas.bpmn2bpel.parser.BPMN4JsonParser;
 import de.ustutt.iaas.bpmn2bpel.parser.ParseException;
 
 public class JsonParserTest {
+	
+	protected static String RESOURCES_DIR = "src/test/resources/bpmn4tosca";
 
 	@Before
 	public void setUp() throws Exception {
@@ -49,9 +51,8 @@ public class JsonParserTest {
 	@Test
 	public void testParse() throws MalformedURLException, ParseException, URISyntaxException {
 		BPMN4JsonParser parser = new BPMN4JsonParser();
-		URI uri = Paths.get("src/test/resources/bpmn4tosca/bppmn4tosca.json").toUri();
-		//Path testBpmn4JsonFile = Paths.get("C:/temp/bpmn4tosca/bppmn4tosca.json");
-		ManagementFlow actualFlow = parser.parse(uri);
+		URI srcUri = Paths.get(RESOURCES_DIR, "bppmn4tosca.json").toUri();
+		ManagementFlow actualFlow = parser.parse(srcUri);
 		ManagementFlow expectedFlow = createReferenceFlow();
 		
 		assertNodeSets(expectedFlow.vertexSet(), actualFlow.vertexSet());
@@ -180,14 +181,15 @@ public class JsonParserTest {
 		StartTask startTask = new StartTask();
 		startTask.setId("element6");
 		startTask.setName("StartEvent");
-		startTask.addOutputParameter(createParameter("SSHUserInput", ParamType.TOPOLOGY, ""));
+		startTask.addOutputParameter(createParameter("SSHUserInput", ParamType.TOPOLOGY, "StartEvent.SSHUserInput"));
 		flow.addVertex(startTask);
 		
 		
 		ManagementTask createEC2Task = new ManagementTask();
 		createEC2Task.setId("element10");
-		createEC2Task.setName("CreateVMAmazonEC2");
-		createEC2Task.setNodeTemplateId(QName.valueOf("{http://tempUri.org}AmazonEC2"));
+		createEC2Task.setName("CreateAmazonEC2Task");
+		createEC2Task.setNodeTemplateId(QName.valueOf("AmazonEC2NodeTemplate"));
+		createEC2Task.setInterfaceName("ec2Interface");
 		createEC2Task.setNodeOperation("CreateVM");
 		createEC2Task.addInputParameter(createParameter("Size", ParamType.STRING ,"t1.medium"));
 		createEC2Task.addInputParameter(createParameter("SSHUser", ParamType.PLAN ,"StartEvent.SSHUserInput"));
@@ -200,11 +202,12 @@ public class JsonParserTest {
 		
 		ManagementTask runUbuntuTask = new ManagementTask();
 		runUbuntuTask.setId("element38");
-		runUbuntuTask.setName("runScriptUbuntuVM");
-		runUbuntuTask.setNodeTemplateId(QName.valueOf("{http://tempUri.org}UbuntuVM")); 
-		runUbuntuTask.setNodeOperation("runScript");
+		runUbuntuTask.setName("InstallUbuntutTask");
+		runUbuntuTask.setNodeTemplateId(QName.valueOf("UbuntuNodeTemplate")); 
+		runUbuntuTask.setInterfaceName("ubunutuInterface");
+		runUbuntuTask.setNodeOperation("installUbuntu");
 		runUbuntuTask.addInputParameter(createParameter("script", ParamType.IA ,"{http://www.opentosca.org}ApacheWebserverInstallImplementation"));
-		runUbuntuTask.addOutputParameter(createParameter("result", ParamType.TOPOLOGY ,""));
+		runUbuntuTask.addOutputParameter(createParameter("result", ParamType.STRING ,""));
 		flow.addVertex(runUbuntuTask);
 
 		EndTask endTask = new EndTask();
