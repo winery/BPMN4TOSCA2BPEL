@@ -7,9 +7,6 @@ apply plugin: 'java'
 // enables generation of eclipse project configurations via `gradlew eclipse`
 apply plugin: 'eclipse'
 
-// see http://www.gradle.org/docs/current/userguide/sonar_runner_plugin.html
-apply plugin: 'sonar-runner'
-
 // see https://github.com/ben-manes/gradle-versions-plugin
 apply plugin: 'com.github.ben-manes.versions'
 
@@ -62,18 +59,14 @@ dependencies {
     compile 'org.jgrapht:jgrapht-core:0.9.1'
 
     compile 'org.apache.velocity:velocity:1.7'
-    
+
     compile 'com.fasterxml.jackson.core:jackson-core:2.6.1'
-    
+
     compile 'com.fasterxml.jackson.core:jackson-databind:2.0.1'
-    
+
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.6.1'
-    
+
     compile 'junit:junit:4.4'
-    
-    
-    
-    
 }
 
 repositories {
