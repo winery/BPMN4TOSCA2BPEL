@@ -6,7 +6,6 @@ import static org.junit.Assert.fail;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.List;
@@ -33,11 +32,11 @@ import de.ustutt.iaas.bpmn2bpel.model.param.Parameter;
 import de.ustutt.iaas.bpmn2bpel.model.param.PlanParameter;
 import de.ustutt.iaas.bpmn2bpel.model.param.StringParameter;
 import de.ustutt.iaas.bpmn2bpel.model.param.TopologyParameter;
-import de.ustutt.iaas.bpmn2bpel.parser.BPMN4JsonParser;
+import de.ustutt.iaas.bpmn2bpel.parser.Bpmn4JsonParser;
 import de.ustutt.iaas.bpmn2bpel.parser.ParseException;
 
 public class JsonParserTest {
-	
+
 	protected static String RESOURCES_DIR = "src/test/resources/bpmn4tosca";
 
 	@Before
@@ -50,20 +49,20 @@ public class JsonParserTest {
 
 	@Test
 	public void testParse() throws MalformedURLException, ParseException, URISyntaxException {
-		BPMN4JsonParser parser = new BPMN4JsonParser();
+		Bpmn4JsonParser parser = new Bpmn4JsonParser();
 		URI srcUri = Paths.get(RESOURCES_DIR, "bppmn4tosca.json").toUri();
 		ManagementFlow actualFlow = parser.parse(srcUri);
 		ManagementFlow expectedFlow = createReferenceFlow();
-		
+
 		assertNodeSets(expectedFlow.vertexSet(), actualFlow.vertexSet());
 		assertLinkSets(expectedFlow.edgeSet(), actualFlow.edgeSet());
-		
+
 	}
-	
+
 	public static void assertNodeSets(Set<Node> expectedNodes, Set<Node> actualNodes) {
 		assertEquals(expectedNodes.size(), actualNodes.size());
-		
-		
+
+
 		for (Iterator<Node> iterator = expectedNodes.iterator(); iterator.hasNext();) {
 			Node expectedNode = (Node) iterator.next();
 			Node actualNode =  getNodeById(expectedNode.getId(), actualNodes);
@@ -74,21 +73,21 @@ public class JsonParserTest {
 			}
 		}
 	}
-	
+
 	public static void assertLinkSets(Set<Link> expectedLinks, Set<Link> actualLinks) {
 		//assertEquals(expectedNodes.size(), actualNodes.size());
 		assertEquals(expectedLinks.size(), actualLinks.size());
-		
-		
+
+
 	}
-	
+
 	public static void assertLink(Link expectedLink, Link actualLink) {
 		assertEquals("Link source: id", expectedLink.getSource().getId(), actualLink.getSource().getId());
-		assertEquals("Link target :id", expectedLink.getTarget().getId(), actualLink.getTarget().getId());	
+		assertEquals("Link target :id", expectedLink.getTarget().getId(), actualLink.getTarget().getId());
 	}
-	
+
 	private static Node getNodeById(String id, Set<Node> nodeSet) {
-		
+
 		Iterator<Node> iter = nodeSet.iterator();
 		while (iter.hasNext()) {
 			Node node = (Node) iter.next();
@@ -98,27 +97,27 @@ public class JsonParserTest {
 		}
 		return null;
 	}
-	
-	
+
+
 	public static void assertNodes(Node expected, Node actual) {
 		//assertEquals(expected.getId(), actual.getId());
 		assertEquals("node: id ", expected.getId(), actual.getId());
-		
+
 		/* Just tasks contain further properties that have to be tested */
 		if (expected instanceof Task) {
-			assertTasks((Task) expected, (Task) actual);	
+			assertTasks((Task) expected, (Task) actual);
 		}
 
 	}
-	
+
 	public static void assertTasks(Task expected, Task actual) {
 		assertEquals("Management node: id ", expected.getId(), actual.getId());
 		assertEquals("Management node: name", expected.getName(), actual.getName());
-		
+
 		if (expected instanceof StartTask) {
-			assertStartTask((StartTask) expected, (StartTask) actual);			 
+			assertStartTask((StartTask) expected, (StartTask) actual);
 		} else if(expected instanceof EndTask) {
-			assertEndTask((EndTask) expected, (EndTask) actual);	
+			assertEndTask((EndTask) expected, (EndTask) actual);
 		} else if(expected instanceof ManagementTask) {
 			assertMngmtTasks((ManagementTask) expected, (ManagementTask) actual);
 		} else {
@@ -132,18 +131,18 @@ public class JsonParserTest {
 		assertParameters(expected.getInputParameters(), actual.getInputParameters());
 		assertParameters(expected.getOutputParameters(), actual.getOutputParameters());
 	}
-	
+
 	public static void assertStartTask(StartTask expected, StartTask actual) {
 		assertParameters(expected.getOutputParameters(), actual.getOutputParameters());
 	}
-	
+
 	public static void assertEndTask(EndTask expected, EndTask actual) {
 		assertParameters(expected.getInputParameters(), actual.getInputParameters());
 	}
-	
-	public static void assertParameters(List<Parameter> expected, List<Parameter> actual) {		
+
+	public static void assertParameters(List<Parameter> expected, List<Parameter> actual) {
 		assertEquals("Number of parameters", expected.size(), actual.size());
-		
+
 		for (Iterator<Parameter> iterator = actual.iterator(); iterator.hasNext();) {
 			Parameter expectedParam = (Parameter) iterator.next();
 			Parameter actualParam = getParameterByName(expectedParam.getName(), actual);
@@ -154,16 +153,16 @@ public class JsonParserTest {
 			}
 		}
 	}
-	
-	public static void assertParameter(Parameter expected, Parameter actual) {		
+
+	public static void assertParameter(Parameter expected, Parameter actual) {
 		assertEquals("Parameter: name", expected.getName(), actual.getName());
 		assertEquals("Parameter: type", expected.getType(), actual.getType());
 		assertEquals("Parameter: value", expected.getValue(), actual.getValue());
 	}
-	
-	
+
+
 	private static Parameter getParameterByName(String name, List<Parameter> parameters) {
-		
+
 		Iterator<Parameter> iter = parameters.iterator();
 		while (iter.hasNext()) {
 			Parameter param = (Parameter) iter.next();
@@ -173,18 +172,18 @@ public class JsonParserTest {
 		}
 		return null;
 	}
-	
-	
+
+
 	private static ManagementFlow createReferenceFlow() {
 		ManagementFlow flow = new ManagementFlow();
-		
+
 		StartTask startTask = new StartTask();
 		startTask.setId("element6");
 		startTask.setName("StartEvent");
 		startTask.addOutputParameter(createParameter("SSHUserInput", ParamType.TOPOLOGY, "StartEvent.SSHUserInput"));
 		flow.addVertex(startTask);
-		
-		
+
+
 		ManagementTask createEC2Task = new ManagementTask();
 		createEC2Task.setId("element10");
 		createEC2Task.setName("CreateAmazonEC2Task");
@@ -199,11 +198,11 @@ public class JsonParserTest {
 		createEC2Task.addInputParameter(createParameter("AccountPassword", ParamType.STRING ,""));
 		createEC2Task.addOutputParameter(createParameter("IPAddress", ParamType.TOPOLOGY ,"UbuntuVM.IPAddress"));
 		flow.addVertex(createEC2Task);
-		
+
 		ManagementTask runUbuntuTask = new ManagementTask();
 		runUbuntuTask.setId("element38");
 		runUbuntuTask.setName("InstallUbuntutTask");
-		runUbuntuTask.setNodeTemplateId(QName.valueOf("UbuntuNodeTemplate")); 
+		runUbuntuTask.setNodeTemplateId(QName.valueOf("UbuntuNodeTemplate"));
 		runUbuntuTask.setInterfaceName("ubunutuInterface");
 		runUbuntuTask.setNodeOperation("installUbuntu");
 		runUbuntuTask.addInputParameter(createParameter("script", ParamType.IA ,"{http://www.opentosca.org}ApacheWebserverInstallImplementation"));
@@ -215,19 +214,19 @@ public class JsonParserTest {
 		endTask.setName("EndEvent");
 		endTask.addInputParameter(createParameter("AppURL", ParamType.CONCAT ,"http://,UbuntuVM.IPAddress,:8080/,PHPApplication.ID"));
 		flow.addVertex(endTask);
-		
-		
+
+
 		flow.addEdge(startTask, createEC2Task);
 		flow.addEdge(createEC2Task, runUbuntuTask);
 		flow.addEdge(runUbuntuTask, endTask);
-		
+
 		return flow;
-		
-		
+
+
 	}
-	
+
 	private static Parameter createParameter(String name, ParamType type, String value) {
-		
+
 		Parameter param = null;
 		switch (type) {
 		case CONCAT:
@@ -251,10 +250,10 @@ public class JsonParserTest {
 		default:
 			fail("Invalid paramet type: " + type);
 		}
-		
+
 		param.setName(name);
 		param.setValue(value);
-		
+
 		return param;
 	}
 

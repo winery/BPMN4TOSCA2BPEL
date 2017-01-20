@@ -1,7 +1,6 @@
 package de.ustutt.iaas.bpmn2bpel.parser;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,15 +35,15 @@ import de.ustutt.iaas.bpmn2bpel.model.param.TopologyParameter;
 /**
  * Copyright 2015 IAAS University of Stuttgart <br>
  * <br>
- * 
+ *
  * TODO describe expected JSON format here
- * 
+ *
  * @author Sebastian Wagner
  *
  */
-public class BPMN4JsonParser extends Parser {
+public class Bpmn4JsonParser extends Parser {
 
-	private static Logger log = LoggerFactory.getLogger(BPMN4JsonParser.class);
+	private static Logger log = LoggerFactory.getLogger(Bpmn4JsonParser.class);
 
 	@Override
 	public ManagementFlow parse(URI jsonFileUrl) throws ParseException {
@@ -59,7 +58,7 @@ public class BPMN4JsonParser extends Parser {
 
 			String prettyPrintedJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rootNode);
 			log.debug("Creating management flow from following Json model:" + prettyPrintedJson);
-			
+
 			ManagementFlow managementFlow = new ManagementFlow();
 			/* Contains the ids (values) of the target nodes of a certain node
 			 * (key is node id of this node) */
@@ -98,8 +97,8 @@ public class BPMN4JsonParser extends Parser {
 				}
 			}
 
-			/* 
-			 * Now since all node models are created they can be linked with each other in the management flow 
+			/*
+			 * Now since all node models are created they can be linked with each other in the management flow
 			 */
 			log.debug("Building management flow by relating node models...");
 			Iterator<Map.Entry<String, Set<String>>> nodeWithTargetsMapIter = nodeWithTargetsMap.entrySet().iterator();
@@ -111,16 +110,16 @@ public class BPMN4JsonParser extends Parser {
 				if (srcNode == null) {
 					throw new Exception("Node with id '" + srcNodeId + "' could not be found in the management flow.");
 				}
-				
+
 				/* Relate the source node with its link targets */
 				Iterator<String> nodeTargetIdsIter = inputParamEntry.getValue().iterator();
 				while (nodeTargetIdsIter.hasNext()) {
 					String targetNodeId = (String) nodeTargetIdsIter.next();
-					Node targetNode = managementFlow.getNode(targetNodeId); 
+					Node targetNode = managementFlow.getNode(targetNodeId);
 					if (targetNode == null) {
 						throw new Exception("Node with id '" + targetNodeId + "' could not be found in the management flow.");
 					}
-					
+
 					log.debug("Creating link between node with id '" + srcNodeId + "' and target node with id '"
 							+ targetNodeId + "'");
 					managementFlow.addEdge(srcNode, targetNode);
@@ -178,7 +177,7 @@ public class BPMN4JsonParser extends Parser {
 		if (inputParams != null) {
 			/*
 			 * Iterator map required to retrieve the name of the parameter node
-			 * 
+			 *
 			 * @see
 			 * http://stackoverflow.com/questions/7653813/jackson-json-get-node-
 			 * name-from-json-tree
@@ -219,7 +218,7 @@ public class BPMN4JsonParser extends Parser {
 	}
 
 	protected ManagementTask createManagementTaskFromJson(JsonNode managementTaskNode) {
-		
+
 		if (!hasRequiredFields(managementTaskNode, Arrays.asList(JsonKeys.NODE_TEMPLATE, JsonKeys.NODE_OPERATION))) {
 			log.warn("Ignoring mangement node: One of the fields '" + JsonKeys.NODE_TEMPLATE +  "' or '"
 					+ JsonKeys.NODE_OPERATION + "' is missing");
@@ -228,17 +227,17 @@ public class BPMN4JsonParser extends Parser {
 		String nodeTemplate = managementTaskNode.get(JsonKeys.NODE_TEMPLATE).asText();
 		String nodeInterfaceName = managementTaskNode.get(JsonKeys.NODE_INTERFACE_NAME).asText();
 		String nodeOperation = managementTaskNode.get(JsonKeys.NODE_OPERATION).asText();
-		
-		log.debug("Creating management task with id '" + managementTaskNode.get(JsonKeys.ID) + "', name '" + managementTaskNode.get(JsonKeys.NAME) 
+
+		log.debug("Creating management task with id '" + managementTaskNode.get(JsonKeys.ID) + "', name '" + managementTaskNode.get(JsonKeys.NAME)
 					+ "', node template '" + nodeTemplate + "', node operation '"+ "', node operation '" + nodeOperation + "'");
-		
+
 		ManagementTask task = new ManagementTask();
 		task.setNodeTemplateId(QName.valueOf(nodeTemplate));
 		task.setNodeOperation(nodeOperation);
 		task.setInterfaceName(nodeInterfaceName);
-		
+
 		return task;
-		
+
 	}
 
 	protected Parameter createParameterFromJson(String paramName, JsonNode paramNode) {
