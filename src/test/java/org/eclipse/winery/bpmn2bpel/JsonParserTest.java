@@ -1,7 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2015-2017 University of Stuttgart.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and the Apache License 2.0 which both accompany this distribution,
+ * and are available at http://www.eclipse.org/legal/epl-v10.html
+ * and http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Contributors:
+ *     Sebastian Wagner - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.winery.bpmn2bpel;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -13,22 +21,17 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import org.eclipse.winery.bpmn2bpel.model.StartTask;
-import org.eclipse.winery.bpmn2bpel.model.param.ParamType;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import org.eclipse.winery.bpmn2bpel.model.EndTask;
 import org.eclipse.winery.bpmn2bpel.model.Link;
 import org.eclipse.winery.bpmn2bpel.model.ManagementFlow;
 import org.eclipse.winery.bpmn2bpel.model.ManagementTask;
 import org.eclipse.winery.bpmn2bpel.model.Node;
+import org.eclipse.winery.bpmn2bpel.model.StartTask;
 import org.eclipse.winery.bpmn2bpel.model.Task;
 import org.eclipse.winery.bpmn2bpel.model.param.ConcatParameter;
 import org.eclipse.winery.bpmn2bpel.model.param.DeploymentArtefactParameter;
 import org.eclipse.winery.bpmn2bpel.model.param.ImplementationArtefactParameter;
+import org.eclipse.winery.bpmn2bpel.model.param.ParamType;
 import org.eclipse.winery.bpmn2bpel.model.param.Parameter;
 import org.eclipse.winery.bpmn2bpel.model.param.PlanParameter;
 import org.eclipse.winery.bpmn2bpel.model.param.StringParameter;
@@ -36,17 +39,16 @@ import org.eclipse.winery.bpmn2bpel.model.param.TopologyParameter;
 import org.eclipse.winery.bpmn2bpel.parser.Bpmn4JsonParser;
 import org.eclipse.winery.bpmn2bpel.parser.ParseException;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 public class JsonParserTest {
 
 	protected static String RESOURCES_DIR = "src/test/resources/bpmn4tosca";
-
-	@Before
-	public void setUp() throws Exception {
-	}
-
-	@After
-	public void tearDown() throws Exception {
-	}
 
 	@Test
 	public void testParse() throws MalformedURLException, ParseException, URISyntaxException {

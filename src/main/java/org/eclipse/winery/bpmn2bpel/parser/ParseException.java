@@ -1,30 +1,36 @@
+/*******************************************************************************
+ * Copyright (c) 2015-2017 University of Stuttgart.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and the Apache License 2.0 which both accompany this distribution,
+ * and are available at http://www.eclipse.org/legal/epl-v10.html
+ * and http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Contributors:
+ *     Sebastian Wagner - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.winery.bpmn2bpel.parser;
 
 public class ParseException extends Exception {
 
 	public ParseException() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public ParseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
-		// TODO Auto-generated constructor stub
 	}
 
 	public ParseException(String message, Throwable cause) {
 		super(message, cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	public ParseException(String message) {
 		super(message);
-		// TODO Auto-generated constructor stub
 	}
 
 	public ParseException(Throwable cause) {
 		super(cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	public ParseException(Exception e) {
