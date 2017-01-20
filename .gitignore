@@ -1,5 +1,9 @@
 .gradle/
 
+#IntelliJ
+.idea/
+classes/
+
 #Eclipse
 bin/
 build/
