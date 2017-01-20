@@ -1,8 +1,11 @@
 # BPMN4TOSCA2BPEL
 Converter for transforming a BPMN4TOSCA management process to a TOSCA BPEL management process
 
+## IDE
+Use IntelliJ as Eclipse has issues with `trim_trailing_whitespace = true`.
+
 ## License
-Copyright (c) 2015 University of Stuttgart.
+Copyright (c) 2015-2017 University of Stuttgart.
 
 All rights reserved. This program and the accompanying materials
 are made available under the terms of the [Eclipse Public License v1.0]
