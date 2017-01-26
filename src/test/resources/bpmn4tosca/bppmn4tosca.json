@@ -89,12 +89,6 @@
         "type": "implementation_artifact",
         "value": "{http://www.opentosca.org}ApacheWebserverInstallImplementation"
       }
-    },
-    "output": {
-      "result": {
-        "type": "string",
-        "value": ""
-      }
     }
   },
   {

@@ -189,7 +189,7 @@ public class Bpmn4JsonParser extends Parser {
 			Iterator<Map.Entry<String, JsonNode>> inputParamIter = inputParams.fields();
 			while (inputParamIter.hasNext()) {
 				Map.Entry<String, JsonNode> inputParamEntry = (Map.Entry<String, JsonNode>) inputParamIter.next();
-				Parameter inputParam = createParameterFromJson(inputParamEntry.getKey(), inputParamEntry.getValue());
+				Parameter inputParam = createParameterFromJson(inputParamEntry.getKey(), inputParamEntry.getValue(), false);
 				task.addInputParameter(inputParam);
 			}
 		} else {
@@ -202,7 +202,7 @@ public class Bpmn4JsonParser extends Parser {
 			Iterator<Map.Entry<String, JsonNode>> outputParamIter = outputParams.fields();
 			while (outputParamIter.hasNext()) {
 				Map.Entry<String, JsonNode> outputParamEntry = (Map.Entry<String, JsonNode>) outputParamIter.next();
-				Parameter outputParam = createParameterFromJson(outputParamEntry.getKey(), outputParamEntry.getValue());
+				Parameter outputParam = createParameterFromJson(outputParamEntry.getKey(), outputParamEntry.getValue(), true);
 				task.addOutputParameter(outputParam);
 			}
 
@@ -244,7 +244,7 @@ public class Bpmn4JsonParser extends Parser {
 
 	}
 
-	protected Parameter createParameterFromJson(String paramName, JsonNode paramNode) {
+	protected Parameter createParameterFromJson(String paramName, JsonNode paramNode, boolean isOutputParam) {
 
 		if (!hasRequiredFields(paramNode, Arrays.asList(JsonKeys.TYPE, JsonKeys.VALUE))) {
 			log.warn("Ignoring parameter node: One of the fields '" + JsonKeys.TYPE +  "' or '"
@@ -271,13 +271,18 @@ public class Bpmn4JsonParser extends Parser {
 			param = new PlanParameter(); // TODO add task name
 			break;
 		case JsonKeys.PARAM_TYPE_VALUE_STRING:
+			if (isOutputParam) {
+				log.error("Parameters of type '" + JsonKeys.PARAM_TYPE_VALUE_STRING 
+						+ "' must not be used as output parameter Du Karausche");
+				return null;
+			}
 			param = new StringParameter();
 			break;
 		case JsonKeys.PARAM_TYPE_VALUE_TOPOLOGY:
 			param = new TopologyParameter();
 			break;
 		default:
-			log.warn("JSON parameter type '" + paramType + "' unknown");
+			log.error("JSON parameter type '" + paramType + "' unknown");
 			return null;
 		}
 

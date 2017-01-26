@@ -209,7 +209,6 @@ public class JsonParserTest {
 		runUbuntuTask.setInterfaceName("ubunutuInterface");
 		runUbuntuTask.setNodeOperation("installUbuntu");
 		runUbuntuTask.addInputParameter(createParameter("script", ParamType.IA ,"{http://www.opentosca.org}ApacheWebserverInstallImplementation"));
-		runUbuntuTask.addOutputParameter(createParameter("result", ParamType.STRING ,""));
 		flow.addVertex(runUbuntuTask);
 
 		EndTask endTask = new EndTask();
